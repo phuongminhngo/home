@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Appart Paris, vrai prix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: practical and calm, a buyer's notebook you can read standing in a stairwell
+   IDEA: the Paris enamel street plaque; every score is a numbered house plaque
+   PICTURE: the ranked list itself, each listing led by its enamel score plaque
+   COLOUR and TYPE: enamel blue, limestone white, plaque green frame, signal red for red flags; Barlow Condensed + Barlow
+   LAYOUT: plaque header, paste box, key figures, ranked cards; one column under 600px */
+:root{color-scheme:light dark;
+--bg:light-dark(#f6f4ef,#0e121a);--card:light-dark(#fff,#171d29);--ink:light-dark(#121826,#e8ebf1);--mut:light-dark(#596275,#9ba4b6);
+--line:light-dark(#e3ded3,#2a3244);--soft:light-dark(#edf1fa,#1b2540);--blue:#1f3f8f;--blue2:light-dark(#1f3f8f,#8eabff);
+--green:#1d6b47;--ok:light-dark(#16764b,#53d197);--red:#c8203a;--red2:light-dark(#b01b31,#ff7484);--org:light-dark(#a95300,#ffad5c);
+--orgbg:light-dark(#fff2e3,#3a2712);--redbg:light-dark(#fde8eb,#3d1820);--infobg:light-dark(#e9eefb,#1d2744)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Barlow,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3,.cond{font-family:"Barlow Condensed",Barlow,sans-serif;font-weight:700;line-height:1.05;margin:0}
+h2{font-size:26px}h3{font-size:20px}
+a{color:var(--blue2)}
+button,select,input,textarea{font:inherit;color:inherit}
+button{min-height:44px;padding:0 16px;border-radius:8px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-weight:600}
+button.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+button.ghost{background:transparent}
+button:disabled{opacity:.5;cursor:default}
+input,select,textarea{min-height:44px;border:1px solid var(--line);border-radius:8px;background:var(--card);padding:8px 10px;font-size:16px;width:100%}
+textarea{min-height:120px;resize:vertical}
+:focus-visible{outline:3px solid var(--blue2);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 max(4vw,14px)}
+header{background:var(--blue);color:#fff;padding:18px 0 0}
+.plq{display:flex;gap:16px;align-items:center;border:3px solid #fff;outline:5px solid var(--green);border-radius:10px;padding:14px 18px;margin:6px 4px 16px}
+.plq .n{font:700 44px/1 "Barlow Condensed";border-right:2px solid #fff;padding-right:16px}
+.plq h1{font-size:clamp(30px,5vw,46px);text-wrap:balance}
+.plq p{margin:4px 0 0;opacity:.88}
+nav{display:flex;gap:4px;overflow-x:auto;align-items:flex-end}
+nav a{flex:none;color:#fff;text-decoration:none;padding:12px 16px;border-radius:8px 8px 0 0;font-weight:600;min-height:44px}
+nav a[aria-current]{background:var(--bg);color:var(--ink)}
+nav b{background:#fff;color:var(--blue);border-radius:10px;padding:0 7px;font-size:13px;margin-left:4px}
+#sync{margin-left:auto;flex:none;font-size:13px;opacity:.85;padding:12px 4px}
+main{padding:22px 0 60px}
+section[hidden]{display:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.mut{color:var(--mut)}.small{font-size:14px}
+.add textarea{margin:12px 0}
+.headline{margin:26px 0 12px;font-size:clamp(28px,4vw,40px);text-wrap:balance}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.kpi b{display:block;font:700 30px/1.1 "Barlow Condensed";white-space:nowrap}
+.kpi span{font-size:14px;color:var(--mut)}
+details.filt{margin-bottom:14px}
+details.filt summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:8px 0}
+.fld{display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--mut)}
+.fld input,.fld select{color:var(--ink)}
+.fld.got input,.fld.got select{border-color:var(--ok);box-shadow:inset 3px 0 0 var(--ok)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{min-height:36px;padding:0 10px;border-radius:18px;font-size:14px}
+.chip[aria-pressed=true]{background:var(--blue);color:#fff;border-color:var(--blue)}
+.tog{display:flex;align-items:center;gap:8px;min-height:44px;font-size:15px}
+.tog input{width:22px;min-height:22px;height:22px}
+ol#list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.item{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:start}
+.item.sus{border-color:var(--red2)}
+.plate{width:78px;border-radius:8px;color:#fff;text-align:center;padding:8px 4px 6px;border:2px solid #fff;outline:3px solid currentColor;box-shadow:0 0 0 3px var(--card)}
+.plate b{display:block;font:700 38px/1 "Barlow Condensed";color:#fff}
+.plate small{font-size:12px;color:#fff;opacity:.9}
+.s-hi{background:var(--green);color:var(--green)}.s-mid{background:var(--blue);color:var(--blue)}.s-lo{background:#6b7280;color:#6b7280}.s-bad{background:var(--red);color:var(--red)}
+.plate .rk{display:block;font-size:12px;color:#fff;opacity:.85}
+.ttl{font:700 21px/1.15 "Barlow Condensed";color:var(--ink);text-decoration:none;cursor:pointer;background:none;border:0;padding:0;min-height:0;text-align:left}
+.ttl:hover{text-decoration:underline}
+.arrb{display:inline-block;background:var(--soft);color:var(--blue2);border-radius:6px;padding:1px 7px;font-weight:600;font-size:14px;margin-right:6px}
+.nums{display:flex;flex-wrap:wrap;gap:4px 16px;margin:6px 0;align-items:baseline}
+.nums .p{font:700 24px/1 "Barlow Condensed";white-space:nowrap}
+.nums span{white-space:nowrap}
+.good{color:var(--ok);font-weight:600}.bad{color:var(--red2);font-weight:600}
+.meta{color:var(--mut);font-size:15px}
+.flags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
+.fl{font-size:13px;border-radius:6px;padding:3px 8px;font-weight:600}
+.fl.grave{background:var(--redbg);color:var(--red2)}.fl.alerte{background:var(--orgbg);color:var(--org)}.fl.info{background:var(--infobg);color:var(--blue2)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+.acts select{width:auto}
+.dpe{display:inline-block;min-width:26px;text-align:center;border-radius:5px;font-weight:700;color:#fff;padding:0 6px}
+.d-A{background:#00956a}.d-B{background:#4ea64f}.d-C{background:#a8bf2c;color:#1b1b1b}.d-D{background:#f2dc1d;color:#1b1b1b}.d-E{background:#eaa72c;color:#1b1b1b}.d-F{background:#d4632a}.d-G{background:#c41d27}
+.exb{font-size:12px;background:var(--soft);color:var(--blue2);border-radius:5px;padding:2px 6px;margin-left:6px;font-weight:600}
+.empty{text-align:center;padding:30px}
+/* detail */
+#ov{position:fixed;inset:0;background:rgba(8,12,20,.55);display:flex;justify-content:center;align-items:flex-start;overflow:auto;padding:24px 12px;z-index:20}
+#ov[hidden]{display:none}
+#dl{width:min(980px,100%);background:var(--bg);border-radius:14px;overflow:hidden}
+#dl .dh{background:var(--blue);color:#fff;padding:16px 18px;display:flex;gap:14px;align-items:center}
+#dl .dh h2{flex:1;font-size:clamp(22px,3vw,30px)}
+#dl .dh .plate{outline-color:#fff;box-shadow:none}
+.dbody{padding:18px;display:grid;gap:16px}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.bars{display:grid;gap:8px}
+.bar{display:grid;grid-template-columns:minmax(0,11em) minmax(0,1fr) 3.2em;gap:8px;align-items:center;font-size:14px}
+.bar i{display:block;height:10px;background:var(--soft);border-radius:5px;overflow:hidden}
+.bar i u{display:block;height:100%;background:var(--blue2)}
+.bar em{font-style:normal;text-align:right;font-variant-numeric:tabular-nums}
+table{border-collapse:collapse;width:100%}
+td,th{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:14px;color:var(--mut);font-weight:600}
+td.n,th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+.cmp th:first-child,.cmp td:first-child{position:sticky;left:0;background:var(--card);z-index:1;min-width:9em}
+.cmp td{min-width:11em}
+.best{color:var(--ok);font-weight:700}
+.chk{display:grid;grid-template-columns:minmax(0,10em) auto minmax(0,1fr);gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.seg{display:flex}
+.seg button{border-radius:0;min-width:64px;padding:0 10px;font-size:14px}
+.seg button:first-child{border-radius:8px 0 0 8px}.seg button:last-child{border-radius:0 8px 8px 0}
+.seg button[aria-pressed=true].ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.seg button[aria-pressed=true].bof{background:var(--org);color:#fff;border-color:var(--org)}
+.seg button[aria-pressed=true].ko{background:var(--red2);color:#fff;border-color:var(--red2)}
+.stars button{font-size:24px;min-width:44px;padding:0;border:0;background:none;color:var(--line)}
+.stars button.on{color:#e0a400}
+.fig{position:relative;min-height:440px}.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.sl{display:grid;grid-template-columns:minmax(0,15em) minmax(0,1fr) 4.5em;gap:10px;align-items:center;padding:4px 0}
+.sl input{min-height:30px;padding:0}
+.sl em{font-style:normal;text-align:right;font-variant-numeric:tabular-nums}
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.big{font:700 clamp(30px,5vw,44px)/1 "Barlow Condensed";white-space:nowrap}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;display:flex;gap:12px;align-items:center;z-index:30;max-width:92vw}
+#toast[hidden]{display:none}
+#toast button{min-height:36px;background:transparent;color:var(--bg);border-color:var(--bg)}
+.stack-sp>*+*{margin-top:16px}
+@media(max-width:600px){
+ .two{grid-template-columns:minmax(0,1fr)}
+ .item{grid-template-columns:minmax(0,1fr)}
+ .plate{display:flex;width:auto;align-items:baseline;gap:8px;justify-content:flex-start;padding:6px 12px}
+ .plate b{font-size:30px}
+ .bar{grid-template-columns:minmax(0,8em) minmax(0,1fr) 3em}
+ .sl{grid-template-columns:minmax(0,1fr) 4em}.sl input{grid-column:1/-1;grid-row:2}
+ .chk{grid-template-columns:minmax(0,1fr)}
+ #ov{padding:0}#dl{border-radius:0;min-height:100%}
+ table{font-size:14px}
+ #sync{display:none}
+}
+@media(prefers-reduced-motion:no-preference){.item{animation:in .35s ease both}@keyframes in{from{opacity:0;transform:translateY(6px)}}}
+</style>
+</head>
+<body>
+<header>
+ <div class="wrap">
+  <div class="plq"><span class="n">75</span><div><h1>Le vrai prix au m²</h1><p>Vos annonces nettoyées, les pièges signalés, les vraies opportunités en tête.</p></div></div>
+  <nav>
+   <a href="#liste">Classement</a><a href="#carte">Carte</a><a href="#comparer">Comparer<b id="cmpN">0</b></a><a href="#reglages">Réglages</a>
+   <span id="sync">Enregistré sur cet appareil</span>
+  </nav>
+ </div>
+</header>
+<main class="wrap">
+<section id="v-liste">
+ <div class="card add">
+  <h2>Ajouter une annonce</h2>
+  <p class="mut small" style="margin:4px 0 0">Collez l’URL SeLoger et, idéalement, tout le texte de l’annonce (titre, prix, surface, description, DPE, étage, adresse). Rien n’est récupéré automatiquement sur SeLoger.</p>
+  <textarea id="paste" placeholder="Ex. : Appartement 3 pièces 62 m², Paris 11e, 559 000 €, 4e étage avec ascenseur, DPE D…"></textarea>
+  <div class="row"><button class="pri" id="bEx">Extraire les champs</button><button id="bAI" hidden>Extraire avec Claude</button><button class="ghost" id="bMan">Saisie manuelle</button></div>
+  <div id="review"></div>
+ </div>
+ <h2 class="headline" id="hl"></h2>
+ <div class="kpis" id="kpis"></div>
+ <details class="filt card" id="fbox">
+  <summary>Filtres et tri <span class="mut small" id="fsum" style="margin-left:8px"></span></summary>
+  <div class="fgrid">
+   <label class="fld"><span>Budget max (coût total, €)</span><input id="f-max" inputmode="numeric"></label>
+   <label class="fld"><span>Surface réelle min (m²)</span><input id="f-minS" inputmode="numeric"></label>
+   <label class="fld"><span>Pièces min</span><select id="f-minP"><option value="">Toutes</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+   <label class="fld"><span>Statut</span><select id="f-st"><option value="">Tous</option></select></label>
+   <label class="fld"><span>Trier par</span><select id="f-sort"><option value="score">Score</option><option value="ppm2">Prix/m² réel</option><option value="total">Coût total</option><option value="arr">Arrondissement</option><option value="date">Date d’ajout</option></select></label>
+   <label class="fld"><span>Recherche</span><input id="f-q" placeholder="quartier, agence, note…"></label>
+  </div>
+  <p class="mut small" style="margin:6px 0">Arrondissements préférés</p>
+  <div class="chips" id="f-arrs"></div>
+  <label class="tog"><input type="checkbox" id="f-hide"> Masquer les annonces suspectes (viager, occupé, erreur de surface, hors Paris…)</label>
+ </details>
+ <ol id="list"></ol>
+</section>
+
+<section id="v-carte" hidden>
+ <h2 class="headline">Où sont les opportunités</h2>
+ <p class="mut">Chaque cercle est un arrondissement : taille selon le nombre d’annonces, couleur selon le meilleur score. Touchez un cercle pour filtrer le classement.</p>
+ <div class="row" style="margin:10px 0"><button id="bWork">Placer mon lieu de référence sur la carte</button><span class="mut small" id="workTxt"></span></div>
+ <div class="card"><div class="fig" id="mapfig"><svg id="map" role="img" aria-label="Carte des arrondissements de Paris"></svg></div></div>
+ <div class="card scroll" style="margin-top:16px"><table id="arrT"></table></div>
+</section>
+
+<section id="v-comparer" hidden>
+ <h2 class="headline">Comparaison côte à côte</h2>
+ <div id="cmpBox"></div>
+</section>
+
+<section id="v-reglages" hidden class="stack-sp">
+ <h2 class="headline">Réglages</h2>
+ <div class="card">
+  <h3>Poids des critères du score</h3>
+  <p class="mut small">Le score sur 100 est une moyenne pondérée. Une donnée manquante compte comme légèrement défavorable. Chaque alerte grave (viager, occupé, surface incohérente, hors Paris, bureau) retire 30 points.</p>
+  <div id="wBox"></div>
+  <div class="row" style="margin-top:8px"><button id="bW0">Poids par défaut</button></div>
+ </div>
+ <div class="card">
+  <h3>Lieu de référence pour la distance</h3>
+  <p class="mut small">Adresse de votre travail par exemple. Formats compris : « 75011 », « Paris 9e », « 48.87, 2.34 », ou une adresse complète (avec Claude si disponible). Vous pouvez aussi cliquer sur la carte.</p>
+  <div class="row"><input id="wAddr" style="flex:1 1 260px" placeholder="Ex. : 12 rue de la Paix, 75002 Paris"><button id="bLoc">Localiser</button></div>
+  <p class="small" id="wRes"></p>
+ </div>
+ <div class="card">
+  <h3>Financement et frais</h3>
+  <div class="fgrid" id="finBox"></div>
+ </div>
+ <div class="card">
+  <h3>Prix moyens par arrondissement (€/m²)</h3>
+  <p class="mut small">Valeurs par défaut : médianes des notaires pour les appartements anciens, consultées en mars 2026 (publiées par iad France). Modifiez-les librement.</p>
+  <div class="agrid" id="avgBox"></div>
+  <div class="row" style="margin-top:10px"><button id="bAvg0">Remettre les valeurs par défaut</button></div>
+ </div>
+ <div class="card">
+  <h3>Données</h3>
+  <p class="mut small">Vos annonces sont enregistrées dans ce navigateur et, si vous êtes connecté, sur votre compte pour les retrouver sur votre téléphone.</p>
+  <div class="row"><button id="bJson">Exporter JSON</button><button id="bCsv">Exporter CSV</button><label class="tog" style="border:1px solid var(--line);border-radius:8px;padding:0 14px;cursor:pointer"><input type="file" id="fImp" accept=".json,.csv,application/json,text/csv" style="display:none">Importer JSON ou CSV</label><button id="bWipe">Tout effacer</button></div>
+  <div id="expBox"></div>
+ </div>
+</section>
+</main>
+
+<div id="ov" hidden><div id="dl" role="dialog" aria-modal="true" aria-labelledby="dTitle"></div></div>
+<div id="toast" hidden><span id="tMsg"></span><button id="tUndo" hidden>Annuler</button></div>
+
+<script>
+{
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const nz=v=>v!==null&&v!==undefined&&v!==''&&!(typeof v==='number'&&isNaN(v));
+const EUR=new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0});
+const NF=new Intl.NumberFormat('fr-FR',{maximumFractionDigits:1});
+const eur=v=>nz(v)?EUR.format(Math.round(v)):'–';
+const num=v=>nz(v)?NF.format(v):'–';
+const pct=v=>(v>0?'+':'')+Math.round(v*100)+' %';
+const arrL=n=>n==null?'?':(n===1?'1er':n+'e');
+const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+
+const AVG0={1:12481,2:11222,3:11914,4:12547,5:11738,6:14414,7:13818,8:11905,9:10745,10:9182,11:9797,12:8875,13:8505,14:9286,15:9433,16:10627,17:10012,18:8727,19:7861,20:8269};
+const CENT={1:[48.8625,2.3364],2:[48.8683,2.3428],3:[48.863,2.3601],4:[48.8543,2.3576],5:[48.8445,2.3497],6:[48.8491,2.3328],7:[48.8562,2.3122],8:[48.8727,2.3125],9:[48.877,2.3375],10:[48.8761,2.3607],11:[48.859,2.38],12:[48.84,2.389],13:[48.8283,2.3622],14:[48.8292,2.3266],15:[48.8401,2.2934],16:[48.863,2.276],17:[48.8873,2.3067],18:[48.8925,2.3484],19:[48.8871,2.3848],20:[48.8634,2.4011]};
+const W0={prix:40,dpe:15,etage:10,lumiere:8,exterieur:8,parking:4,charges:8,distance:7};
+const WL={prix:'Prix/m² réel vs moyenne de l’arrondissement',dpe:'DPE',etage:'Étage et ascenseur',lumiere:'Lumière et exposition',exterieur:'Extérieur (balcon, terrasse)',parking:'Parking',charges:'Charges de copro',distance:'Distance au lieu de référence'};
+const ST={a_visiter:'À visiter',visitee:'Visitée',offre:'Offre faite',rejetee:'Rejetée'};
+const CHK={humidite:'Humidité',bruit:'Bruit',lumiere:'Lumière',immeuble:'État de l’immeuble',pv:'PV d’AG de copro'};
+const FIELDS=[['title','Titre','text'],['url','Lien de l’annonce','text'],['price','Prix (€)','num'],['surface','Surface annoncée (m²)','num'],['carrez','Surface Carrez / habitable (m²)','num'],['included','Extérieur compté dans la surface (m²)','num'],['rooms','Pièces','num'],['bedrooms','Chambres','num'],['floor','Étage (0 = RDC)','num'],['floorsTotal','Nombre d’étages','num'],['lift','Ascenseur','tri'],['arr','Arrondissement','arr'],['quartier','Quartier','text'],['dpe','DPE','letter'],['ges','GES','letter'],['year','Année de construction','num'],['charges','Charges copro (€/mois)','num'],['outdoor','Extérieur (m²)','num'],['outdoorType','Type d’extérieur','text'],['parking','Parking','tri'],['expo','Exposition','text'],['traversant','Traversant','tri'],['isNew','Neuf / VEFA','tri'],['agency','Agence','text'],['renov','Travaux estimés (€)','num'],['lat','Latitude (optionnel)','num'],['lng','Longitude (optionnel)','num']];
+const KEYF=['price','surface','carrez','included','rooms','bedrooms','floor','floorsTotal','lift','arr','quartier','dpe','ges','year','charges','outdoor','outdoorType','parking','expo','agency','isNew'];
+const NUMK=new Set(['price','surface','carrez','included','rooms','bedrooms','floor','floorsTotal','arr','year','charges','outdoor','renov','rating','lat','lng']);
+const BOOLK=new Set(['lift','parking','traversant','isNew']);
+
+const defS=()=>({avg:{...AVG0},w:{...W0},work:null,fin:{apport:80000,taux:3.3,duree:25,assur:0.3},not:{ancien:8,neuf:2.5},renov:{F:500,G:700},f:{max:'',minS:'',minP:'',arrs:[],st:'',hide:false,q:''},sort:'score',cmp:[],updated:0});
+let S=defS(),L=[];
+const KEY='appart-paris-v1';
+function mergeS(x){const d=defS();if(!x||typeof x!=='object')return d;return{...d,...x,avg:{...d.avg,...(x.avg||{})},w:{...d.w,...(x.w||{})},fin:{...d.fin,...(x.fin||{})},not:{...d.not,...(x.not||{})},renov:{...d.renov,...(x.renov||{})},f:{...d.f,...(x.f||{}),arrs:Array.isArray(x.f?.arrs)?x.f.arrs:[]},cmp:Array.isArray(x.cmp)?x.cmp:[]}}
+try{const d=JSON.parse(localStorage.getItem(KEY)||'null');if(d){L=Array.isArray(d.L)?d.L.filter(o=>o&&o.id):[];S=mergeS(d.S)}}catch(e){}
+function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify({L,S}))}catch(e){}}
+
+/* ---------- extraction ---------- */
+const N=s=>{if(s==null)return null;s=String(s).replace(/[\s  ]/g,'');if(/^\d{1,3}(\.\d{3})+$/.test(s))s=s.replace(/\./g,'');s=s.replace(',','.');const v=parseFloat(s);return isNaN(v)?null:v};
+const WORD={un:1,une:1,deux:2,trois:3,quatre:4,cinq:5,six:6,sept:7,huit:8};
+const ORD={premier:1,deuxieme:2,second:2,troisieme:3,quatrieme:4,cinquieme:5,sixieme:6,septieme:7,huitieme:8};
+const CITIES=['Aubervilliers','Saint-Ouen','Pantin','Montreuil','Bagnolet','Les Lilas','Le Pré-Saint-Gervais','Vincennes','Saint-Mandé','Charenton','Ivry-sur-Seine','Le Kremlin-Bicêtre','Gentilly','Montrouge','Malakoff','Vanves','Issy-les-Moulineaux','Boulogne-Billancourt','Neuilly-sur-Seine','Levallois-Perret','Clichy','Saint-Denis','Romainville','Bobigny','Créteil','Nanterre','Courbevoie','Puteaux','Arcueil','Villejuif','Bagneux','Châtillon','Clamart','Asnières','Colombes','Fontenay-sous-Bois','Nogent-sur-Marne','Joinville-le-Pont','Maisons-Alfort','Alfortville','Saint-Maurice','Noisy-le-Sec','Le Pré Saint-Gervais'];
+const NUMRE='(\\d{1,4}(?:[.,]\\d{1,2})?)';
+function extract(raw){
+ const t=String(raw||'').replace(/\r/g,'');const lo=t.toLowerCase();const o={};const got=new Set();
+ const set=(k,v)=>{if(nz(v)&&o[k]==null){o[k]=v;got.add(k)}};
+ const url=(t.match(/https?:\/\/[^\s"'<>]+/)||[])[0];
+ if(url){o.url=url;const m=url.match(/paris-(\d{1,2})(?:eme|er|e)?-75\/([a-z][a-z0-9-]*)?/i);if(m){const a=+m[1];if(a>=1&&a<=20)set('arr',a);if(m[2])set('quartier',m[2].replace(/-/g,' ').replace(/\b\w/g,c=>c.toUpperCase()))}
+  const mt=url.match(/\/(appartement|maison|bureau|bureaux|local|loft|duplex|parking|terrain)s?\//i);if(mt)o.type=mt[1].toLowerCase()}
+ const x=url?lo.split(url.toLowerCase()).join(' '):lo;
+ const lines=t.split('\n').map(s=>s.trim()).filter(s=>s&&!/^https?:\/\//.test(s));
+ if(lines[0])o.title=lines[0].slice(0,140);
+ let m;
+ // prix
+ for(const p of x.matchAll(/(\d{1,3}(?:[\s  .]\d{3})+|\d{5,8})(?:,\d+)?\s*(?:€|eur\b|euros?\b)(\s*(?:\/|par|le)\s*m(?:²|2|[eè]tre)|\s*(?:\/|par)\s*(?:mois|an))?/g)){
+  if(p[2])continue;const v=N(p[1]);if(!(v>=15000&&v<=60000000))continue;
+  const before=x.slice(Math.max(0,p.index-45),p.index);if(/(charges?|taxe|honoraires|loyer|rente|frais|mensualit|revenus?)[^.]*$/.test(before)&&!/prix/.test(before))continue;
+  set('price',v);break}
+ if(o.price==null&&(m=x.match(/(\d+(?:[.,]\d+)?)\s*(?:m€|millions?\s*(?:d['’]\s*)?(?:€|euros))/)))set('price',Math.round(N(m[1])*1e6));
+ // surfaces
+ const carRe=[new RegExp('(?:loi\\s*)?carrez\\s*(?:de\\s*|:\\s*)?(?:environ\\s*)?'+NUMRE+'\\s*m'),new RegExp(NUMRE+'\\s*m(?:²|2)?\\s*(?:loi\\s*)?carrez'),new RegExp('surface (?:habitable|privative)\\s*(?:de\\s*|:\\s*)?(?:environ\\s*)?'+NUMRE+'\\s*m'),new RegExp(NUMRE+'\\s*m(?:²|2)?\\s*(?:habitables?|privatifs?)')];
+ for(const r of carRe){if(m=x.match(r)){set('carrez',N(m[1]));break}}
+ const OUTW='terrasses?|balcons?|jardins?|loggias?|rooftop|patio|cour privative';
+ if(m=x.match(new RegExp('dont\\s+(?:une?\\s+)?(?:(?:'+OUTW+')\\s*(?:de\\s*)?'+NUMRE+'\\s*m|'+NUMRE+'\\s*m(?:²|2)?\\s*(?:de\\s+)?(?:'+OUTW+'))')))set('included',N(m[1]||m[2]));
+ for(const s of x.matchAll(new RegExp(NUMRE+'\\s*(?:m²|m2|m\\b|mètres? carrés)','g'))){
+  const v=N(s[1]);if(!v||v<5)continue;const pre=x.slice(Math.max(0,s.index-28),s.index),post=x.slice(s.index+s[0].length,s.index+s[0].length+22);
+  if(/(terrasse|balcon|jardin|loggia|cave|chambre|séjour|salon|pièce de vie|cuisine|cour|parking|box|grenier|dont|salle|bureau de|rooftop|patio)s?\s*(?:de\s*|d['’]environ\s*|d['’]|:|d'une surface de\s*)?(?:environ\s*)?$/.test(pre))continue;
+  if(/^\s*(?:de\s+)?(?:terrasse|balcon|jardin|loggia|cave|parking|grenier|cour|séjour|salon)/.test(post))continue;
+  if(/^\s*(?:loi\s*)?carrez/.test(post)&&o.surface==null&&s.index>0){set('surface',v);break}
+  set('surface',v);break}
+ if(o.surface==null&&o.carrez!=null)set('surface',o.carrez);
+ const outA=x.match(new RegExp('('+OUTW+')[^.\\n\\d]{0,30}?'+NUMRE+'\\s*m(?:²|2|\\b)'));const outB=x.match(new RegExp(NUMRE+'\\s*m(?:²|2)?\\s*(?:de\\s+)?('+OUTW+')'));
+ if(outB){set('outdoor',N(outB[1]));set('outdoorType',outB[2].replace(/s$/,''))}else if(outA){set('outdoor',N(outA[2]));set('outdoorType',outA[1].replace(/s$/,''))}
+ else if((m=x.match(new RegExp('\\b('+OUTW+')\\b')))&&!/(sans|pas de) (terrasse|balcon|jardin)/.test(x))set('outdoorType',m[1].replace(/s$/,''));
+ // pièces, chambres
+ if(m=x.match(/(\d{1,2})\s*pi[eè]ces?/))set('rooms',+m[1]);else if(m=x.match(/\b[tf](\d)\b/))set('rooms',+m[1]);else if(/\bstudios?\b/.test(x))set('rooms',1);
+ if(m=x.match(/(\d{1,2}|une|deux|trois|quatre|cinq|six)\s*chambres?/))set('bedrooms',WORD[m[1]]??+m[1]);else if(o.rooms===1)set('bedrooms',0);
+ // étage
+ const nx=norm(x);
+ if(m=x.match(/(\d{1,2})\s*(?:er|e|ème|eme|è|°)?\s*étage\s*(?:sur|\/)\s*(\d{1,2})/)){set('floor',+m[1]);set('floorsTotal',+m[2])}
+ else if(m=x.match(/étage\s*:?\s*(\d{1,2})\s*(?:\/|sur)\s*(\d{1,2})/)){set('floor',+m[1]);set('floorsTotal',+m[2])}
+ else if(m=x.match(/(\d{1,2})\s*(?:er|e|ème|eme|è|°)\s*(?:et\s+dernier\s+)?étage/))set('floor',+m[1]);
+ else if(m=nx.match(/\b(premier|deuxieme|second|troisieme|quatrieme|cinquieme|sixieme|septieme|huitieme)\s+(?:et\s+dernier\s+)?etage/))set('floor',ORD[m[1]]);
+ else if(m=x.match(/étage\s*:?\s*(\d{1,2})\b/))set('floor',+m[1]);
+ if(o.floor==null&&/rez[- ]de[- ]chauss|\brdc\b|rez-de-jardin/.test(x))set('floor',0);
+ if(o.floorsTotal==null&&(m=x.match(/(?:sur|immeuble (?:de|en)|r\+)\s*(\d{1,2})\s*(?:étages|niveaux)?/)))if(/r\+/.test(m[0])||/étages|niveaux/.test(m[0]))set('floorsTotal',+m[1]+(/r\+/.test(m[0])?0:0));
+ if(/dernier étage/.test(x)){o.lastFloor=true;if(o.floor==null&&o.floorsTotal!=null)set('floor',o.floorsTotal);if(o.floorsTotal==null&&o.floor!=null)set('floorsTotal',o.floor)}
+ if(/sans ascenseur|pas d['’]ascenseur|absence d['’]ascenseur|ascenseur\s*:\s*non/.test(x))set('lift',false);else if(/ascenseur/.test(x))set('lift',true);
+ // arrondissement
+ if(o.arr==null){
+  if(m=x.match(/\b75(?:0(\d{2})|116)\b/)){const a=m[1]?+m[1]:16;if(a>=1&&a<=20)set('arr',a)}
+  else if(m=x.match(/(\d{1,2})\s*(?:e|er|ème|eme)\s*arr/)){const a=+m[1];if(a>=1&&a<=20)set('arr',a)}
+  else if(m=x.match(/paris\s*[-,]?\s*(\d{1,2})\s*(?:e|er|ème|eme)?\b(?!\s*(?:pièces|p\b|chambres|m²|m2|min))/)){const a=+m[1];if(a>=1&&a<=20)set('arr',a)}
+ }
+ if(o.quartier==null&&(m=t.match(/quartier\s+(?:de\s+la\s+|de\s+l['’]|du\s+|des\s+|de\s+)?([A-ZÀ-Ý][\wÀ-ÿ'’ -]{2,40})/)))set('quartier',m[1].trim().replace(/\s+(et|à|avec|proche|au)\b.*$/i,''));
+ // DPE / GES
+ if(m=x.match(/(?:\bdpe\b|classe\s+[ée]nergie|[ée]tiquette\s+[ée]nergie|performance\s+[ée]nerg[ée]tique|consommation\s+[ée]nerg[ée]tique|diagnostic\s+[ée]nerg[ée]tique)\s*(?:\(dpe\)\s*)?(?:[:\-–]\s*)?(?:classe\s*|de\s*la\s*classe\s*|en\s*)?(?:lettre\s*)?\b([a-g])\b/))set('dpe',m[1].toUpperCase());
+ if(m=x.match(/(?:\bges\b|gaz\s+[àa]\s+effet\s+de\s+serre|classe\s+climat|[ée]missions?\s+de\s+gaz)\s*(?:\(ges\)\s*)?(?:[:\-–]\s*)?(?:classe\s*)?\b([a-g])\b/))set('ges',m[1].toUpperCase());
+ // année
+ if(m=x.match(/(?:ann[ée]e de construction|construit(?:e)?\s+en|construction\s*(?:de|en|:)?|b[aâ]ti(?:e)?\s+en|datant de|immeuble de)\s*:?\s*((?:1[5-9]|20)\d\d)/))set('year',+m[1]);
+ else if(m=x.match(/ann[ée]es\s*(\d)0\b/))set('year',1900+(+m[1])*10);
+ if(/haussmann/.test(x))o.style='haussmannien';
+ // charges
+ if(m=x.match(/charges?(?:\s+de\s+copropri[ée]t[ée])?(?:\s+courantes)?(?:\s+(annuelles|mensuelles|trimestrielles))?\s*(?:[:\-]\s*)?(?:de\s*|d['’]environ\s*|environ\s*)?(\d[\d\s  .]*(?:,\d+)?)\s*(?:€|eur|euros)\s*(?:(?:\/|par|tous les)\s*(an|année|mois|trimestre|trim))?/)){
+  let v=N(m[2]);const u=(m[1]||'')+' '+(m[3]||'');
+  if(v!=null){if(/ann|an\b/.test(u))v=v/12;else if(/trim/.test(u))v=v/3;else if(!/mois|mens/.test(u)&&v>1500)v=v/12;set('charges',Math.round(v))}}
+ else if(m=x.match(/(\d[\d\s .]*)\s*€\s*(?:\/\s*(mois|an))?\s*de charges/)){let v=N(m[1]);if(m[2]==='an'||v>1500)v=v/12;set('charges',Math.round(v))}
+ // parking, agence, exposition, neuf
+ if(/\b(parking|box|garage|place de stationnement)\b/.test(x)&&!/(sans|pas de) (parking|box|garage)/.test(x)&&o.type!=='parking')set('parking',true);
+ if(m=t.match(/(?:agence|propos[ée]e?\s+par|annonce\s+(?:publi[ée]e|diffus[ée]e)\s+par|mandataire)\s*:?\s*([^\n,.;]{2,60})/i)){const a=m[1].trim();if(!/^(immobili[eè]re? )?(de|du|des|la|le|les)?\s*$/i.test(a))set('agency',/^agence/i.test(m[0])?('Agence '+a).slice(0,60):a)}
+ if(m=x.match(/(?:expos[ée]e?s?|exposition|orient[ée]e?s?|orientation)\s*:?\s*(?:plein\s+)?(sud[- ]ouest|sud[- ]est|nord[- ]ouest|nord[- ]est|sud|nord|est|ouest)\b/))set('expo',m[1].replace(' ','-'));
+ else if(m=x.match(/plein\s+(sud|ouest|est)\b/))set('expo',m[1]);
+ if(/traversant/.test(x))set('traversant',true);
+ const xn=x.replace(/(refait|rénov[ée]e?|remis|état)\s+(à|a)\s+neuf|comme\s+neuf|neuf\s+(pièces|chambres)/g,'');
+ if(/\b(vefa|programme neuf|logement neuf|appartement neuf|livraison (?:prévue|prévisionnelle)|frais de notaire réduits)\b/.test(xn))set('isNew',true);
+ // autre ville
+ const cities=[];const pcs=[...x.matchAll(/\b(9[1-5]\d{3}|7[78]\d{3})\b/g)].map(p=>p[1]);
+ for(const c of CITIES){const r=new RegExp('(^|[^a-z])('+norm(c).replace(/[- ]/g,'[- ]')+')(?![a-z])','g');let q;while(q=r.exec(nx)){const pre=nx.slice(Math.max(0,q.index-28),q.index+q[1].length);
+   if(/(bois|porte|avenue|av\.|rue|boulevard|bd|quai|route|gare|ligne|direction|puces|marche|square|place|villa|passage|impasse|cite|chaussee|faubourg|metro)\s+(de\s+|d'|du\s+|des\s+)?(la\s+|l')?$/.test(pre))continue;
+   const strong=/(\ba\s+|sur la commune de\s+|situe\s+a\s+|ville de\s+|commune de\s+)$/.test(pre);cities.push({c,strong});break}}
+ o._cities=cities;o._pcs=pcs;
+ o.desc=t.trim();
+ return{o,got};
+}
+
+/* ---------- calculs ---------- */
+function realSurf(l){if(nz(l.carrez)&&l.carrez>0)return l.carrez;if(nz(l.surface)&&nz(l.included)&&l.included>0&&l.included<l.surface)return l.surface-l.included;return nz(l.surface)&&l.surface>0?l.surface:null}
+function coords(l){if(nz(l.lat)&&nz(l.lng))return{lat:l.lat,lng:l.lng};const c=CENT[l.arr];return c?{lat:c[0],lng:c[1]}:null}
+function hav(a,b){const R=6371,r=Math.PI/180,dl=(b.lat-a.lat)*r,dg=(b.lng-a.lng)*r;const h=Math.sin(dl/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dg/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function cityInfo(l){const d=l.desc||'';if(!d)return{cities:[],pcs:[]};const e=extract(d).o;return{cities:e._cities||[],pcs:e._pcs||[]}}
+const cityCache=new Map();
+function getCities(l){const k=l.desc||'';if(!cityCache.has(k))cityCache.set(k,cityInfo(l));return cityCache.get(k)}
+function flags(l,c){
+ const F=[];const add=(lvl,txt)=>{if(!F.some(f=>f.txt===txt))F.push({lvl,txt})};
+ const d=(l.desc||'').toLowerCase()+' '+(l.title||'').toLowerCase();const ag=(l.agency||'').toLowerCase();
+ if(/viager/.test(d)||/viager/.test(ag))add('grave',ag.includes('viager')&&!/viager/.test(d)?'Agence spécialisée viager':'Viager');
+ if(/\bbouquet\b/.test(d))add('grave','Bouquet (viager)');
+ if(/\brentes?\b/.test(d))add('grave','Rente (viager)');
+ if(/\boccupée?s?(?![a-zà-ÿ])|locataires? en place|bail en cours|vendue? lou[ée]|vente occup/.test(d))add('grave','Bien occupé');
+ else if(/\blouée?s?(?![a-zà-ÿ])/.test(d))add('grave','Bien loué');
+ if(/nue[- ]propri/.test(d))add('grave','Nue-propriété');
+ if(/usufruit/.test(d))add('grave','Usufruit');
+ if(/ench[èe]res|mise à prix/.test(d))add('grave','Vente aux enchères');
+ if(/\bbureaux\b|local (?:commercial|professionnel|d['’]activit)|usage (?:de |d['’])?bureau|murs commerciaux|fonds de commerce/.test(d)||/^(bureau|bureaux|local)/.test(l.type||''))add('grave','Bureau ou local, pas un logement');
+ const ci=getCities(l);
+ const ext=ci.pcs.find(p=>!/^75/.test(p));
+ if(ext)add('grave','Code postal hors Paris ('+ext+')');
+ for(const k of ci.cities){if(k.strong||l.arr==null)add('grave','Situé à '+k.c+', pas à Paris');else add('alerte','Mentionne '+k.c+' : vérifier l’adresse')}
+ if(l.arr==null)add('alerte','Arrondissement inconnu');
+ if(!nz(l.price)||!c.real)add('alerte','Prix ou surface manquant');
+ if(c.ppm2!=null&&(c.ppm2<3000||c.ppm2>30000))add('grave','Prix/m² incohérent ('+eur(c.ppm2)+'/m²)');
+ if(nz(l.surface)&&l.surface>300&&nz(l.rooms)&&l.rooms<=3)add('grave','Surface suspecte : '+num(l.surface)+' m² pour '+l.rooms+' pièce'+(l.rooms>1?'s':''));
+ if(c.real&&c.real<9)add('alerte','Moins de 9 m² : non habitable');
+ if(nz(l.included)&&l.included>0)add('info','Extérieur de '+num(l.included)+' m² retiré : prix/m² sur '+num(c.real)+' m²');
+ else if(nz(l.carrez)&&nz(l.surface)&&l.carrez<l.surface-1)add('info','Prix/m² calculé sur la surface Carrez ('+num(l.carrez)+' m²)');
+ else if(nz(l.outdoor)&&l.outdoor>0&&nz(l.surface)&&!nz(l.carrez)&&(l.outdoor>=.2*l.surface||/surface totale|terrasse incluse|balcon inclus|dont terrasse|dont balcon/.test(d)))add('alerte','Extérieur de '+num(l.outdoor)+' m² peut-être compté dans la surface');
+ if(l.dpe==='G')add('alerte','DPE G : travaux lourds, location interdite');
+ else if(l.dpe==='F')add('alerte','DPE F : travaux, location interdite dès 2028');
+ if(l.floor===0)add('alerte','Rez-de-chaussée');
+ else if(nz(l.floor)&&l.floor>=3&&l.lift===false)add('alerte',arrL(l.floor).replace('1er','1er')+' étage sans ascenseur');
+ else if(nz(l.floor)&&l.floor>=4&&l.lift==null)add('info','Ascenseur non précisé');
+ return F}
+function floorS(l){const f=l.floor;if(!nz(f))return null;if(f===0)return .1;const lift=l.lift;let s;if(f===1)s=.5;else if(f<=3)s=lift===false?.6:.8;else s=lift===true?1:lift===false?(f>=5?.1:.25):.6;if(nz(l.floorsTotal)&&f===l.floorsTotal&&lift!==false)s=Math.min(1,s+.1);return s}
+function lightS(l){const ck=l.check?.lumiere?.v;if(ck)return{ok:1,bof:.5,ko:0}[ck];let s=.5,known=false;const e=norm(l.expo);if(e){known=true;if(/sud/.test(e))s+=.3;else if(/ouest|est/.test(e))s+=.15;else if(/nord/.test(e))s-=.2}
+ if(l.traversant){s+=.2;known=true}const d=norm(l.desc);if(/tres lumineux|baigne de lumiere|plein soleil|sans vis-a-vis|vue degagee|vue imprenable/.test(d)){s+=.2;known=true}else if(/lumineux/.test(d)){s+=.1;known=true}
+ if(/sombre|(^|[^s][^a][^n][^s] )vis-a-vis|sur cour/.test(d.replace(/sans vis-a-vis/g,''))){s-=.15;known=true}if(l.floor===0){s-=.2;known=true}else if(l.floor>=4){s+=.1;known=true}return known?clamp(s,0,1):null}
+function outS(l){if(nz(l.outdoor)&&l.outdoor>0)return clamp(.35+l.outdoor/15,0,1);if(l.outdoorType)return .5;return 0}
+function calc(l){
+ const c={};c.real=realSurf(l);c.ppm2=nz(l.price)&&c.real?l.price/c.real:null;c.avg=+S.avg[l.arr]||9700;c.ratio=c.ppm2?c.ppm2/c.avg:null;
+ const w=S.work,co=coords(l);c.km=w&&co?hav(co,w):null;
+ const sub={prix:c.ratio==null?0:clamp((1.3-c.ratio)/.6,0,1),dpe:l.dpe?{A:1,B:.9,C:.75,D:.55,E:.35,F:.1,G:0}[l.dpe]:null,etage:floorS(l),lumiere:lightS(l),exterieur:outS(l),parking:l.parking==null?null:(l.parking?1:0),charges:nz(l.charges)&&c.real?clamp((5-l.charges/c.real)/4,0,1):null,distance:c.km==null?null:clamp(1-(c.km-1)/7,0,1)};
+ let sw=0,ss=0;for(const k in W0){if(k==='distance'&&!w)continue;const wt=Math.max(0,+S.w[k]||0);const v=sub[k]==null?.4:sub[k];sw+=wt;ss+=wt*v}
+ c.sub=sub;c.base=sw?100*ss/sw:0;c.flags=flags(l,c);c.grave=c.flags.filter(f=>f.lvl==='grave').length;c.pen=Math.min(c.grave*30,90);c.score=Math.max(0,Math.round(c.base-c.pen));
+ c.notary=nz(l.price)?l.price*(l.isNew?+S.not.neuf:+S.not.ancien)/100:null;
+ c.renovAuto=c.real&&(l.dpe==='F'||l.dpe==='G')?c.real*(+S.renov[l.dpe]||0):0;c.renov=nz(l.renov)?l.renov:c.renovAuto;
+ c.total=nz(l.price)?l.price+c.notary+c.renov:null;
+ const f=S.fin;c.loan=c.total!=null?Math.max(0,c.total-(+f.apport||0)):null;
+ if(c.loan!=null){const r=(+f.taux||0)/100/12,n=Math.max(1,(+f.duree||25)*12);const m=r?c.loan*r/(1-(1+r)**-n):c.loan/n;c.monthly=m+c.loan*(+f.assur||0)/100/12}else c.monthly=null;
+ return c}
+const scls=c=>c.grave?'s-bad':c.score>=70?'s-hi':c.score>=50?'s-mid':'s-lo';
+
+/* ---------- exemples ---------- */
+const EX=[
+`Appartement 3 pièces 62 m² Paris 11e
+https://www.seloger.com/annonces/achat/appartement/paris-11eme-75/folie-mericourt/000000001.htm
+559 000 €
+Paris 11ème, quartier Folie-Méricourt. Au 4e étage sur 6 avec ascenseur d'un bel immeuble ancien, appartement traversant de 62 m² Carrez, exposé sud-ouest, très lumineux. Entrée, séjour de 24 m², cuisine séparée, deux chambres, balcon de 5 m². Cave.
+Classe énergie D, GES D. Charges de copropriété : 2 640 €/an. Agence Bastille Immobilier.`,
+`Viager occupé 2 pièces 48 m² Paris 15e (75015)
+95 000 €
+Viager occupé sur une tête, femme de 82 ans. Bouquet 95 000 €, rente de 1 100 € par mois. 2e étage avec ascenseur. DPE E.
+Agence Viager Conseil Paris.`,
+`2 pièces 830 m² Paris 18e
+389 000 €
+Paris 18e (75018), Lamarck. Joli 2 pièces de 38 m² au 5e étage sans ascenseur, une chambre, séjour sur rue. DPE F. Charges 140 €/mois.
+Proposé par Montmartre Immo.`,
+`Appartement 3 pièces 78 m² dernier étage Paris 20e
+629 000 €
+Paris 20e, 75020, quartier Jourdain. 78 m² dont 25 m² de terrasse, au 6e étage sur 6 avec ascenseur, vue dégagée, plein sud. Deux chambres. DPE C, GES C. Charges 210 €/mois. Parking en sous-sol.
+Agence des Lilas.`,
+`Appartement 3 pièces 64 m² Paris 18e
+449 000 €
+À Saint-Ouen-sur-Seine (93400), proche métro Mairie de Saint-Ouen, 3 pièces de 64 m² au 2e étage, deux chambres, balcon. DPE E. Charges 160 €/mois.`,
+`Appartement 2 pièces 41 m² Paris 13e
+362 000 €
+Paris 13e (75013), Butte-aux-Cailles. 2 pièces de 41 m² au 3e étage avec ascenseur, une chambre, exposé est, calme sur cour arborée. Immeuble de 1972 bien entretenu. DPE C. Charges de copropriété 1 900 € par an.
+Agence Italie Habitat.`];
+let SAMPLES=[];
+function mkListing(o,extra){const id='l'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);const l={id,added:new Date().toISOString(),status:'a_visiter',notes:'',check:{},rating:null,...o,...extra};delete l._cities;delete l._pcs;l.updated=Date.now();return l}
+SAMPLES=EX.map((t,i)=>{const l=mkListing(extract(t).o,{sample:true});l.id='ex'+i;l.added=new Date(Date.now()-i*864e5).toISOString();return l});
+
+/* ---------- stockage cloud ---------- */
+let coll=null;const pend={},busy={},tmr={};
+const syncTxt=t=>{$('#sync').textContent=t};
+const strip=l=>{const o={...l};delete o._c;return JSON.parse(JSON.stringify(o))};
+function cloudPut(key,data){if(!coll)return;pend[key]={data};clearTimeout(tmr[key]);tmr[key]=setTimeout(()=>flush(key),600)}
+async function flush(key){if(busy[key]||!pend[key]||!coll)return;const p=pend[key];delete pend[key];busy[key]=true;
+ try{if(p.data)await coll.doc(key).set(p.data);else await coll.doc(key).delete();syncTxt('Synchronisé sur vos appareils');
+  if(p.data&&key.startsWith('L_')){const l=L.find(x=>'L_'+x.id===key);if(l){l._c=true;saveLocal()}}}
+ catch(e){syncTxt(e&&e.code==='quota_exceeded'?'Stockage du compte plein : exportez puis supprimez des annonces':'Non synchronisé, enregistré sur cet appareil')}
+ busy[key]=false;if(pend[key])flush(key)}
+function applyRemote(remote,first){
+ let ch=false;
+ for(const k in remote){if(!k.startsWith('L_'))continue;const r=remote[k];if(!r||!r.id)continue;const i=L.findIndex(x=>x.id===r.id);
+  if(i<0){L.push({...r,_c:true});ch=true}else if((r.updated||0)>(L[i].updated||0)){L[i]={...r,_c:true};ch=true}else{if(!L[i]._c){L[i]._c=true}if(first&&(L[i].updated||0)>(r.updated||0))cloudPut(k,strip(L[i]))}}
+ for(let i=L.length-1;i>=0;i--){const k='L_'+L[i].id;if(!remote[k]){if(first||!L[i]._c){if(!pend[k]&&!busy[k])cloudPut(k,strip(L[i]))}else if(!pend[k]&&!busy[k]){L.splice(i,1);ch=true}}}
+ const rs=remote.settings;if(rs&&(rs.updated||0)>(S.updated||0)){S=mergeS(rs);ch=true;fillSettings()}else if(first&&(!rs||(S.updated||0)>(rs.updated||0)))cloudPut('settings',JSON.parse(JSON.stringify(S)));
+ if(ch){saveLocal();renderAll()}}
+async function initCloud(){
+ if(!window.claude||typeof claude.use!=='function')return;
+ try{const [d,u]=await Promise.all([claude.use('db'),claude.use('user')]);if(!d||!u)return;const id=await u.id();if(!id)return;
+  coll=d.collection('data/users/'+id);syncTxt('Connexion au compte…');
+  const to=setTimeout(()=>syncTxt('Synchro injoignable, données sur cet appareil'),10000);let first=true;
+  coll.onSnapshot(snap=>{if(snap.metadata.fromCache)return;clearTimeout(to);const remote={};snap.docs.forEach(x=>{remote[x.id]=x.data()});const f=first;first=false;if(f)syncTxt('Synchronisé sur vos appareils');setTimeout(()=>applyRemote(remote,f),0)},
+   e=>{clearTimeout(to);syncTxt('Synchro indisponible, données sur cet appareil');coll=null})
+ }catch(e){}}
+let sampleFn=null,dlFn=null;
+async function initCaps(){if(!window.claude||typeof claude.use!=='function')return;
+ try{sampleFn=await claude.use('sample');if(sampleFn){$('#bAI').hidden=false}}catch(e){}
+ try{dlFn=await claude.use('downloads')}catch(e){}}
+
+/* ---------- sauvegarde ---------- */
+const saveT={};
+function saveL(l,now){l.updated=Date.now();if(l.sample){renderAll();return}saveLocal();clearTimeout(saveT[l.id]);const go=()=>cloudPut('L_'+l.id,strip(l));if(now)go();else saveT[l.id]=setTimeout(go,300)}
+function saveS(){S.updated=Date.now();saveLocal();cloudPut('settings',JSON.parse(JSON.stringify(S)))}
+function shown(){return L.length?L:SAMPLES}
+const byId=id=>L.find(x=>x.id===id)||SAMPLES.find(x=>x.id===id);
+
+/* ---------- toast ---------- */
+let undoFn=null,tT;
+function toast(msg,undo){$('#tMsg').textContent=msg;undoFn=undo||null;$('#tUndo').hidden=!undo;$('#toast').hidden=false;clearTimeout(tT);tT=setTimeout(()=>{$('#toast').hidden=true;undoFn=null},6500)}
+$('#tUndo').onclick=()=>{if(undoFn)undoFn();$('#toast').hidden=true;undoFn=null};
+
+/* ---------- champs de formulaire ---------- */
+function fieldHTML(f,l,pfx,got){const[k,lab,type]=f;const v=l[k];const id=pfx+k;const g=got&&got.has(k)?' got':'';
+ if(type==='tri')return`<label class="fld${g}"><span>${lab}</span><select id="${id}" data-k="${k}" data-t="tri"><option value="">Non précisé</option><option value="1"${v===true?' selected':''}>Oui</option><option value="0"${v===false?' selected':''}>Non</option></select></label>`;
+ if(type==='letter')return`<label class="fld${g}"><span>${lab}</span><select id="${id}" data-k="${k}" data-t="letter"><option value="">?</option>${'ABCDEFG'.split('').map(a=>`<option${v===a?' selected':''}>${a}</option>`).join('')}</select></label>`;
+ if(type==='arr')return`<label class="fld${g}"><span>${lab}</span><select id="${id}" data-k="${k}" data-t="arr"><option value="">Inconnu / hors Paris</option>${Array.from({length:20},(_,i)=>`<option value="${i+1}"${v===i+1?' selected':''}>${arrL(i+1)}</option>`).join('')}</select></label>`;
+ const ph=k==='renov'?` placeholder="auto"`:'';
+ return`<label class="fld${g}"><span>${lab}</span><input id="${id}" data-k="${k}" data-t="${type}"${type==='num'?' inputmode="decimal"':''}${ph} value="${esc(nz(v)?v:'')}"></label>`}
+function readF(el){const t=el.dataset.t,v=el.value;if(t==='tri')return v===''?null:v==='1';if(t==='letter')return v||null;if(t==='arr')return v?+v:null;if(t==='num'){const n=N(v);return n}const s=v.trim();return s||null}
+
+/* ---------- ajout / revue ---------- */
+let draft=null,draftGot=null;
+function showReview(){
+ const rv=$('#review');if(!draft){rv.innerHTML='';return}
+ const c=calc(draft);const total=KEYF.length;const n=KEYF.filter(k=>nz(draft[k])).length;
+ const onlyUrl=draft.url&&(draft.desc||'').replace(draft.url,'').trim().length<20;
+ rv.innerHTML=`<div style="margin-top:16px;border-top:1px solid var(--line);padding-top:14px">
+ <h3>Vérifiez les champs <span class="mut small">(${n}/${total} trouvés, en vert)</span></h3>
+ ${onlyUrl?'<p class="small" style="color:var(--org)">Seule l’URL a été collée : l’appli ne lit pas SeLoger. Complétez les champs ou collez aussi le texte de l’annonce.</p>':''}
+ <div class="fgrid" id="rvF">${FIELDS.filter(f=>!['lat','lng','renov'].includes(f[0])).map(f=>fieldHTML(f,draft,'r_',draftGot)).join('')}</div>
+ <div id="rvLive"></div>
+ <div class="row" style="margin-top:10px"><button class="pri" id="bAdd">Ajouter au classement</button><button class="ghost" id="bCancel">Annuler</button></div></div>`;
+ liveReview()}
+function liveReview(){const c=calc(draft);$('#rvLive').innerHTML=`<div class="row" style="margin-top:10px"><span class="plate ${scls(c)}" style="width:auto;padding:4px 12px"><b style="font-size:26px;display:inline">${c.score}</b><small> /100</small></span><span>${c.ppm2?eur(c.ppm2)+'/m² réel':'Prix/m² non calculable'}${c.ratio?` · <span class="${c.ratio<1?'good':'bad'}">${pct(c.ratio-1)} vs ${arrL(draft.arr)}</span>`:''}</span></div><div class="flags">${c.flags.map(f=>`<span class="fl ${f.lvl}">${esc(f.txt)}</span>`).join('')}</div>`}
+$('#review').addEventListener('input',e=>{const el=e.target;if(!el.dataset.k||!draft)return;draft[el.dataset.k]=readF(el);el.closest('.fld')?.classList.remove('got');liveReview()});
+$('#review').addEventListener('change',e=>{const el=e.target;if(!el.dataset.k||!draft)return;draft[el.dataset.k]=readF(el);liveReview()});
+$('#review').addEventListener('click',e=>{
+ if(e.target.id==='bCancel'){draft=null;showReview()}
+ if(e.target.id==='bAdd'){const l=mkListing(draft,{});L.unshift(l);saveL(l,true);draft=null;$('#paste').value='';showReview();renderAll();toast('Annonce ajoutée : score '+calc(l).score+'/100')}});
+function startDraft(text){const {o,got}=extract(text);draft=o;draftGot=got;showReview()}
+$('#bEx').onclick=()=>{const t=$('#paste').value.trim();if(!t){$('#paste').focus();return}startDraft(t)};
+$('#bMan').onclick=()=>{draft={desc:$('#paste').value.trim()};draftGot=new Set();showReview()};
+$('#bAI').onclick=async()=>{const t=$('#paste').value.trim();if(!t||!sampleFn){$('#paste').focus();return}
+ const b=$('#bAI');b.disabled=true;b.textContent='Claude lit l’annonce…';
+ const base=extract(t);
+ try{const v=await sampleFn.json(`Tu extrais les champs d'une annonce immobilière française collée par un acheteur. Réponds UNIQUEMENT avec un objet JSON ayant exactement ces clés (null si l'information est absente, ne devine pas) :
+title (texte court), price (prix de vente en €, nombre), surface (m² annoncés), carrez (m² Carrez ou habitables si mentionnés séparément), included (m² de terrasse/balcon/jardin compris dans la surface annoncée, seulement si le texte le dit, ex. "dont 20 m² de terrasse"), rooms, bedrooms, floor (0 = rez-de-chaussée), floorsTotal, lift (true/false), arr (numéro 1 à 20 si le bien est dans Paris intra-muros, sinon null), quartier, city (commune réelle du bien), dpe (lettre A-G), ges (lettre A-G), year (année de construction), charges (charges de copropriété en € PAR MOIS), outdoor (m² d'extérieur), outdoorType (balcon/terrasse/jardin/loggia), parking (true/false), agency, expo (exposition, ex. sud-ouest), traversant (true/false), isNew (true si neuf/VEFA).
+Annonce :
+"""${t.slice(0,12000)}"""`,{modelTier:'quick'});
+  const o=base.o,got=base.got;
+  if(v&&typeof v==='object'){for(const k of FIELDS.map(f=>f[0])){let x=v[k];if(x==null||x==='')continue;
+   if(NUMK.has(k)){x=typeof x==='number'?x:N(x);if(x==null)continue}else if(BOOLK.has(k)){if(typeof x!=='boolean')continue}else if(k==='dpe'||k==='ges'){x=String(x).trim().toUpperCase();if(!/^[A-G]$/.test(x))continue}else x=String(x).slice(0,140);
+   if(k==='arr'&&!(x>=1&&x<=20))continue;o[k]=x;got.add(k)}
+   if(v.city&&!/^paris/i.test(String(v.city))&&!o._cities.some(q=>norm(q.c)===norm(v.city)))o.desc=(o.desc||'')+'\n[Commune détectée par Claude : à '+String(v.city).slice(0,60)+']'}
+  draft=o;draftGot=got;showReview()}
+ catch(e){toast(e&&e.code==='rate_limited'?'Claude est occupé, réessayez dans un instant':'Extraction par Claude impossible, extraction simple utilisée');draft=base.o;draftGot=base.got;showReview()}
+ b.disabled=false;b.textContent='Extraire avec Claude'};
+
+/* ---------- liste ---------- */
+function filtered(){
+ const f=S.f;const q=norm(f.q);
+ let arr=shown().map(l=>({l,c:calc(l)}));
+ arr=arr.filter(({l,c})=>{if(nz(f.max)&&N(f.max)&&c.total!=null&&c.total>N(f.max))return false;if(nz(f.minS)&&N(f.minS)&&(c.real||0)<N(f.minS))return false;if(f.minP&&(l.rooms||0)<+f.minP)return false;
+  if(f.arrs.length&&!f.arrs.includes(l.arr))return false;if(f.st&&l.status!==f.st)return false;if(f.hide&&c.grave)return false;
+  if(q&&!norm([l.title,l.quartier,l.agency,l.notes,l.desc].join(' ')).includes(q))return false;return true});
+ const s=S.sort,big=1e12;
+ arr.sort((a,b)=>s==='ppm2'?(a.c.ppm2??big)-(b.c.ppm2??big):s==='total'?(a.c.total??big)-(b.c.total??big):s==='arr'?((a.l.arr??99)-(b.l.arr??99))||(b.c.score-a.c.score):s==='date'?String(b.l.added).localeCompare(String(a.l.added)):(b.c.score-a.c.score)||((a.c.ppm2??big)-(b.c.ppm2??big)));
+ return arr}
+function card({l,c},i){
+ const fl=c.flags.filter(f=>f.lvl!=='info'||true);
+ const flo=nz(l.floor)?(l.floor===0?'RDC':arrL(l.floor)+(nz(l.floorsTotal)?'/'+l.floorsTotal:''))+(l.lift===true?' asc.':l.lift===false?' sans asc.':''):null;
+ const meta=[nz(l.rooms)?l.rooms+' p.':null,nz(l.bedrooms)?l.bedrooms+' ch.':null,flo,l.outdoorType?(l.outdoorType+(nz(l.outdoor)?' '+num(l.outdoor)+' m²':'')):null,l.parking?'parking':null,nz(l.charges)?'charges '+eur(l.charges)+'/mois':null,c.km!=null?num(c.km)+' km':null,l.quartier].filter(Boolean).map(esc).join(' · ');
+ const inCmp=S.cmp.includes(l.id);
+ return`<li class="card item${c.grave?' sus':''}">
+ <div class="plate ${scls(c)}"><span class="rk">n°${i+1}</span><b>${c.score}</b><small>/100</small></div>
+ <div>
+  <div><span class="arrb">${arrL(l.arr)}</span><button class="ttl" data-open="${esc(l.id)}">${esc(l.title||'Annonce sans titre')}</button>${l.sample?'<span class="exb">Exemple</span>':''}</div>
+  <div class="nums"><span class="p">${eur(l.price)}</span><span>${c.real?num(c.real)+' m²':'surface ?'}${nz(l.surface)&&c.real&&Math.abs(c.real-l.surface)>.5?` <s class="mut">${num(l.surface)}</s>`:''}</span><span><b>${c.ppm2?eur(c.ppm2)+'/m²':'–'}</b>${c.ratio?` <span class="${c.ratio<1?'good':'bad'}">${pct(c.ratio-1)}</span>`:''}</span>${l.dpe?`<span class="dpe d-${l.dpe}" title="DPE">${l.dpe}</span>`:''}<span class="mut">total ${eur(c.total)}</span></div>
+  ${meta?`<div class="meta">${meta}</div>`:''}
+  ${fl.length?`<div class="flags">${fl.map(f=>`<span class="fl ${f.lvl}">${esc(f.txt)}</span>`).join('')}</div>`:''}
+  <div class="acts">${l.sample?'':`<select data-st="${esc(l.id)}" aria-label="Statut">${Object.entries(ST).map(([k,v])=>`<option value="${k}"${l.status===k?' selected':''}>${v}</option>`).join('')}</select>`}
+   <label class="tog"><input type="checkbox" data-cmp="${esc(l.id)}"${inCmp?' checked':''}> Comparer</label>
+   <button class="ghost" data-open="${esc(l.id)}">Détail${l.rating?' · '+'★'.repeat(l.rating):''}</button>
+   ${l.url&&/^https:\/\//.test(l.url)?`<a href="${esc(l.url)}" target="_blank" rel="noopener" class="small">Voir l’annonce</a>`:''}</div>
+ </div></li>`}
+function renderList(){
+ const all=shown().map(l=>({l,c:calc(l)}));const arr=filtered();
+ const sus=all.filter(x=>x.c.grave).length;const clean=all.filter(x=>!x.c.grave).sort((a,b)=>b.c.score-a.c.score);
+ const top=clean[0];
+ $('#hl').textContent=!L.length?'Exemples : collez votre première annonce pour remplacer ces six annonces de démonstration':top?`Meilleure opportunité : ${top.l.title||'annonce'}${top.l.arr?' ('+arrL(top.l.arr)+')':''}, ${top.c.score}/100`:'Aucune annonce fiable pour l’instant';
+ const pp=clean.map(x=>x.c.ppm2).filter(Boolean).sort((a,b)=>a-b);const med=pp.length?pp[Math.floor(pp.length/2)]:null;
+ const under=clean.filter(x=>x.c.ratio&&x.c.ratio<.95).length;
+ $('#kpis').innerHTML=[[all.length,'annonces suivies'],[sus,'suspectes signalées'],[top?top.c.score+'/100':'–','meilleur score'],[med?eur(med):'–','prix/m² réel médian (fiables)'],[under,'sous la moyenne de −5 % ou plus'],[top&&top.c.monthly?eur(top.c.monthly):'–','mensualité du n°1']].map(([b,s])=>`<div class="kpi"><b>${esc(b)}</b><span>${esc(s)}</span></div>`).join('');
+ const f=S.f;const act=[f.max&&'budget',f.minS&&'surface',f.minP&&'pièces',f.arrs.length&&f.arrs.length+' arr.',f.st&&'statut',f.hide&&'sans suspectes',f.q&&'recherche'].filter(Boolean);
+ $('#fsum').textContent=(act.length?act.join(', ')+' · ':'')+arr.length+' affichée'+(arr.length>1?'s':'');
+ $('#list').innerHTML=arr.length?arr.map(card).join(''):`<li class="card empty"><p>Aucune annonce ne correspond aux filtres.</p><button id="bClrF">Effacer les filtres</button></li>`;
+ $('#cmpN').textContent=S.cmp.filter(id=>byId(id)).length}
+$('#list').addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(o){openD(o.dataset.open);return}if(e.target.id==='bClrF'){S.f={...defS().f};saveS();fillFilters();renderAll()}});
+$('#list').addEventListener('change',e=>{const t=e.target;
+ if(t.dataset.st){const l=byId(t.dataset.st);if(l){l.status=t.value;saveL(l,true)}}
+ if(t.dataset.cmp){const id=t.dataset.cmp;S.cmp=S.cmp.filter(x=>x!==id&&byId(x));if(t.checked){if(S.cmp.length>=4){t.checked=false;toast('4 annonces maximum dans la comparaison');return}S.cmp.push(id)}saveS();$('#cmpN').textContent=S.cmp.length}});
+
+/* ---------- filtres ---------- */
+$('#f-st').innerHTML+=Object.entries(ST).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+function fillFilters(){const f=S.f;$('#f-max').value=f.max||'';$('#f-minS').value=f.minS||'';$('#f-minP').value=f.minP||'';$('#f-st').value=f.st||'';$('#f-q').value=f.q||'';$('#f-hide').checked=!!f.hide;$('#f-sort').value=S.sort;
+ $('#f-arrs').innerHTML=Array.from({length:20},(_,i)=>`<button class="chip" data-a="${i+1}" aria-pressed="${f.arrs.includes(i+1)}">${arrL(i+1)}</button>`).join('')}
+let fT;const fUp=()=>{clearTimeout(fT);fT=setTimeout(()=>{saveS();renderList()},250)};
+[['f-max','max'],['f-minS','minS'],['f-q','q']].forEach(([id,k])=>$('#'+id).addEventListener('input',e=>{S.f[k]=e.target.value;fUp()}));
+$('#f-minP').onchange=e=>{S.f.minP=e.target.value;fUp()};$('#f-st').onchange=e=>{S.f.st=e.target.value;fUp()};$('#f-hide').onchange=e=>{S.f.hide=e.target.checked;fUp()};$('#f-sort').onchange=e=>{S.sort=e.target.value;fUp()};
+$('#f-arrs').addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=+b.dataset.a;S.f.arrs=S.f.arrs.includes(a)?S.f.arrs.filter(x=>x!==a):[...S.f.arrs,a];b.setAttribute('aria-pressed',S.f.arrs.includes(a));fUp()});
+
+/* ---------- détail ---------- */
+let curId=null;
+function openD(id){const l=byId(id);if(!l)return;curId=id;
+ $('#dl').innerHTML=`<div class="dh"><div id="dPlate"></div><h2 id="dTitle">${esc(l.title||'Annonce')}</h2><button id="dClose" style="background:transparent;color:#fff;border-color:#fff">Fermer</button></div>
+ <div class="dbody">
+  ${l.sample?'<p class="small" style="color:var(--org);margin:0">Annonce d’exemple : vos modifications ne sont pas enregistrées.</p>':''}
+  <div class="flags" id="dFlags"></div>
+  <div class="two"><div class="card"><h3>Score détaillé</h3><div class="bars" id="dBars" style="margin-top:10px"></div></div><div class="card"><h3>Budget</h3><div id="dBud" style="margin-top:8px"></div></div></div>
+  <div class="card"><h3>Après la visite</h3>
+   <div class="row" style="margin:8px 0"><label class="fld" style="flex:1 1 180px"><span>Statut</span><select id="dSt">${Object.entries(ST).map(([k,v])=>`<option value="${k}"${l.status===k?' selected':''}>${v}</option>`).join('')}</select></label>
+   <div><span class="mut small">Ma note</span><div class="stars" id="dStars">${[1,2,3,4,5].map(n=>`<button data-r="${n}" aria-label="${n} sur 5" class="${(l.rating||0)>=n?'on':''}">★</button>`).join('')}</div></div></div>
+   <div id="dChk">${Object.entries(CHK).map(([k,lab])=>{const v=l.check?.[k]||{};return`<div class="chk"><b>${lab}</b><div class="seg" data-ck="${k}">${[['ok','Bon'],['bof','Moyen'],['ko','Problème']].map(([s,t])=>`<button class="${s}" data-v="${s}" aria-pressed="${v.v===s}">${t}</button>`).join('')}</div><input data-ckn="${k}" placeholder="Remarque" value="${esc(v.n||'')}"></div>`}).join('')}</div>
+   <label class="fld" style="margin-top:12px"><span>Mes notes</span><textarea id="dNotes" rows="4">${esc(l.notes||'')}</textarea></label>
+  </div>
+  <div class="card"><h3>Fiche</h3><div class="fgrid" id="dF" style="margin-top:10px">${FIELDS.map(f=>fieldHTML(f,l,'d_')).join('')}</div>
+   <details style="margin-top:10px"><summary style="cursor:pointer;min-height:44px;display:flex;align-items:center">Texte de l’annonce</summary><textarea id="dDesc" rows="8">${esc(l.desc||'')}</textarea><button id="dRe" style="margin-top:8px">Ré-extraire (remplit les champs vides)</button></details></div>
+  <div class="row"><span class="mut small">Ajoutée le ${esc(new Date(l.added).toLocaleDateString('fr-FR'))}</span><span style="flex:1"></span>${l.sample?`<button class="pri" id="dKeep">Garder dans mes annonces</button>`:`<button id="dDel" style="color:var(--red2)">Supprimer</button>`}</div>
+ </div>`;
+ $('#ov').hidden=false;document.body.style.overflow='hidden';liveD();$('#dClose').focus()}
+function liveD(){const l=byId(curId);if(!l)return;const c=calc(l);
+ $('#dPlate').innerHTML=`<div class="plate ${scls(c)}" style="width:72px"><b>${c.score}</b><small>/100</small></div>`;
+ $('#dFlags').innerHTML=c.flags.length?c.flags.map(f=>`<span class="fl ${f.lvl}">${esc(f.txt)}</span>`).join(''):'<span class="fl info">Aucune alerte</span>';
+ const wsum=Object.keys(W0).filter(k=>k!=='distance'||S.work).reduce((a,k)=>a+(+S.w[k]||0),0)||1;
+ $('#dBars').innerHTML=Object.keys(W0).map(k=>{if(k==='distance'&&!S.work)return`<div class="bar"><span>${WL[k]}</span><span class="mut small">Définissez un lieu dans Réglages</span><em></em></div>`;const v=c.sub[k];const w=(+S.w[k]||0)/wsum;return`<div class="bar"><span title="poids ${Math.round(w*100)} %">${WL[k]}</span><i><u style="width:${Math.round((v??.4)*100)}%;${v==null?'opacity:.35':''}"></u></i><em>${v==null?'?':Math.round(v*100)}</em></div>`}).join('')+
+  `<p class="small mut" style="margin:6px 0 0">Score avant alertes ${Math.round(c.base)}${c.pen?` · pénalité alertes graves −${c.pen}`:''}${c.ppm2?` · ${eur(c.ppm2)}/m² réel contre ${eur(c.avg)}/m² en moyenne (${arrL(l.arr)})`:''}${c.km!=null?` · ${num(c.km)} km à vol d’oiseau de ${esc(S.work.label||'votre lieu')}`:''}</p>`;
+ const f=S.fin;
+ $('#dBud').innerHTML=`<table><tr><td>Prix</td><td class="n">${eur(l.price)}</td></tr><tr><td>Frais de notaire (${l.isNew?S.not.neuf:S.not.ancien} %${l.isNew?', neuf':''})</td><td class="n">${eur(c.notary)}</td></tr><tr><td>Travaux ${nz(l.renov)?'(saisis)':l.dpe==='F'||l.dpe==='G'?`(DPE ${l.dpe}, ${eur(S.renov[l.dpe])}/m²)`:''}</td><td class="n">${eur(c.renov)}</td></tr><tr><td><b>Coût total</b></td><td class="n"><b>${eur(c.total)}</b></td></tr><tr><td>Emprunt (apport ${eur(f.apport)})</td><td class="n">${eur(c.loan)}</td></tr></table>
+ <p style="margin:10px 0 0"><span class="big">${eur(c.monthly)}</span> <span class="mut">/mois sur ${f.duree} ans à ${num(+f.taux)} %, assurance comprise</span></p>`}
+function closeD(){$('#ov').hidden=true;document.body.style.overflow='';curId=null;renderAll()}
+$('#ov').addEventListener('click',e=>{if(e.target.id==='ov'||e.target.id==='dClose')closeD()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#ov').hidden)closeD()});
+$('#dl').addEventListener('input',e=>{const l=byId(curId);if(!l)return;const t=e.target;
+ if(t.dataset.k){l[t.dataset.k]=readF(t);if(t.dataset.k==='title')$('#dTitle').textContent=l.title||'Annonce'}
+ else if(t.id==='dNotes')l.notes=t.value;else if(t.id==='dDesc')l.desc=t.value;
+ else if(t.dataset.ckn){l.check=l.check||{};l.check[t.dataset.ckn]={...(l.check[t.dataset.ckn]||{}),n:t.value}}else return;
+ saveL(l);liveD()});
+$('#dl').addEventListener('change',e=>{const l=byId(curId);if(!l)return;const t=e.target;if(t.id==='dSt'){l.status=t.value;saveL(l,true)}else if(t.dataset.k&&t.tagName==='SELECT'){l[t.dataset.k]=readF(t);saveL(l);liveD()}});
+$('#dl').addEventListener('click',e=>{const l=byId(curId);if(!l)return;const t=e.target;
+ const seg=t.closest('[data-ck]');if(seg&&t.dataset.v){const k=seg.dataset.ck;l.check=l.check||{};const cur=l.check[k]||{};const nv=cur.v===t.dataset.v?null:t.dataset.v;l.check[k]={...cur,v:nv};$$('button',seg).forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===nv));saveL(l,true);liveD();return}
+ if(t.dataset.r){const r=+t.dataset.r;l.rating=l.rating===r?null:r;$$('#dStars button').forEach(b=>b.classList.toggle('on',(l.rating||0)>=+b.dataset.r));saveL(l,true);return}
+ if(t.id==='dRe'){const {o}=extract(l.desc||'');let n=0;for(const[k]of FIELDS){if(!nz(l[k])&&nz(o[k])){l[k]=o[k];n++}}saveL(l,true);toast(n+' champ'+(n>1?'s':'')+' complété'+(n>1?'s':''));const id=curId;openD(id);return}
+ if(t.id==='dKeep'){const nl=mkListing({...l,sample:false},{});delete nl.sample;L.unshift(nl);saveL(nl,true);closeD();toast('Annonce ajoutée à vos annonces');return}
+ if(t.id==='dDel'){const i=L.indexOf(l);if(i<0)return;L.splice(i,1);S.cmp=S.cmp.filter(x=>x!==l.id);saveLocal();cloudPut('L_'+l.id,null);closeD();
+  toast('Annonce supprimée',()=>{L.splice(Math.min(i,L.length),0,l);delete l._c;saveL(l,true);renderAll()})}});
+
+/* ---------- carte ---------- */
+const OUT=[[48.9016,2.32],[48.9017,2.37],[48.8955,2.399],[48.8785,2.411],[48.853,2.4155],[48.8345,2.413],[48.8228,2.39],[48.8158,2.3605],[48.8178,2.332],[48.8255,2.3],[48.8345,2.276],[48.8455,2.2615],[48.858,2.255],[48.8712,2.2605],[48.8805,2.279],[48.8875,2.2935],[48.8965,2.3045]];
+const SEINE=[[48.8345,2.257],[48.848,2.2775],[48.8578,2.2925],[48.863,2.31],[48.8605,2.33],[48.857,2.3465],[48.8525,2.3595],[48.8445,2.3705],[48.835,2.384],[48.8275,2.395],[48.8195,2.412]];
+let workMode=false;const mapSvg=$('#map');let proj=null;
+function drawMap(){const W=mapSvg.clientWidth,H=mapSvg.clientHeight;if(!W||!H)return;const k=.658,lo0=2.247,lo1=2.42,la0=48.812,la1=48.906;
+ const sc=Math.min((W-30)/((lo1-lo0)*k),(H-30)/(la1-la0));const ox=(W-(lo1-lo0)*k*sc)/2,oy=(H-(la1-la0)*sc)/2;
+ const P=(la,lg)=>[ox+(lg-lo0)*k*sc,oy+(la1-la)*sc];proj={P,inv:(x,y)=>({lat:la1-(y-oy)/sc,lng:lo0+(x-ox)/(k*sc)})};
+ const by={};shown().forEach(l=>{if(!l.arr)return;const c=calc(l);(by[l.arr]=by[l.arr]||[]).push(c)});
+ const small=W<520;
+ let h=`<polygon points="${OUT.map(p=>P(p[0],p[1]).join(',')).join(' ')}" style="fill:var(--soft);stroke:var(--line);stroke-width:2"/>`;
+ h+=`<polyline points="${SEINE.map(p=>P(p[0],p[1]).join(',')).join(' ')}" style="fill:none;stroke:#7fb2da;stroke-width:${small?5:8};stroke-linecap:round;stroke-linejoin:round;opacity:.75"/>`;
+ for(let a=1;a<=20;a++){const[x,y]=P(...CENT[a]);const cs=by[a]||[];const n=cs.length;const best=n?Math.max(...cs.filter(c=>!c.grave).map(c=>c.score),-1):-1;
+  const col=!n?'var(--card)':best<0?'var(--red)':best>=70?'var(--green)':best>=50?'var(--blue)':'#6b7280';const r=(small?13:17)+Math.min(n,6)*(small?2:3);
+  const pref=S.f.arrs.includes(a);
+  h+=`<g data-arr="${a}" style="cursor:pointer"><circle cx="${x}" cy="${y}" r="${r}" style="fill:${col};stroke:${pref?'var(--ink)':'var(--line)'};stroke-width:${pref?3:1.5}"/><text x="${x}" y="${y+(n?-1:5)}" text-anchor="middle" style="fill:${n?'#fff':'var(--ink)'};font:700 ${small?13:16}px 'Barlow Condensed'">${arrL(a)}</text>${n?`<text x="${x}" y="${y+13}" text-anchor="middle" style="fill:#fff;font:600 11px Barlow">${n} ann.</text>`:''}</g>`}
+ if(S.work){const[x,y]=P(S.work.lat,S.work.lng);h+=`<g pointer-events="none"><path d="M${x},${y} l-9,-16 a10,10 0 1,1 18,0 z" style="fill:var(--red);stroke:#fff;stroke-width:2"/><circle cx="${x}" cy="${y-21}" r="3.5" fill="#fff"/>${small?'':`<text x="${x+14}" y="${y-18}" style="fill:var(--ink);font:600 13px Barlow">${esc((S.work.label||'Lieu de référence').slice(0,40))}</text>`}</g>`}
+ mapSvg.innerHTML=h}
+const mapRO=new ResizeObserver(()=>{if(!$('#v-carte').hidden)drawMap()});mapRO.observe(mapSvg);
+mapSvg.addEventListener('click',e=>{const rect=mapSvg.getBoundingClientRect();
+ if(workMode&&proj){const p=proj.inv(e.clientX-rect.left,e.clientY-rect.top);S.work={lat:+p.lat.toFixed(5),lng:+p.lng.toFixed(5),label:'Point choisi sur la carte'};workMode=false;$('#bWork').textContent='Placer mon lieu de référence sur la carte';saveS();renderAll();toast('Lieu de référence placé');return}
+ const g=e.target.closest('[data-arr]');if(g){S.f.arrs=[+g.dataset.arr];saveS();fillFilters();location.hash='liste';toast('Filtré sur le '+arrL(+g.dataset.arr))}});
+$('#bWork').onclick=()=>{workMode=!workMode;$('#bWork').textContent=workMode?'Touchez la carte à l’endroit voulu…':'Placer mon lieu de référence sur la carte'};
+function renderArrT(){const by={};shown().forEach(l=>{if(l.arr)(by[l.arr]=by[l.arr]||[]).push(calc(l))});
+ $('#arrT').innerHTML=`<thead><tr><th>Arr.</th><th class="n">Prix moyen réf.</th><th class="n">Annonces</th><th class="n">Médiane annonces</th><th class="n">Meilleur score</th></tr></thead><tbody>${Array.from({length:20},(_,i)=>{const a=i+1,cs=by[a]||[];const ok=cs.filter(c=>!c.grave);const pp=ok.map(c=>c.ppm2).filter(Boolean).sort((x,y)=>x-y);const med=pp.length?pp[Math.floor(pp.length/2)]:null;const best=ok.length?Math.max(...ok.map(c=>c.score)):null;
+ return`<tr><td>${arrL(a)}</td><td class="n">${eur(+S.avg[a])}</td><td class="n">${cs.length||''}</td><td class="n">${med?eur(med)+(med<+S.avg[a]?' <span class="good">▼</span>':''):''}</td><td class="n">${best!=null?best:''}</td></tr>`}).join('')}</tbody>`;
+ $('#workTxt').textContent=S.work?'Référence : '+(S.work.label||'point choisi'):'Aucun lieu de référence : la distance n’entre pas dans le score.'}
+
+/* ---------- comparaison ---------- */
+function renderCmp(){const items=S.cmp.map(byId).filter(Boolean).map(l=>({l,c:calc(l)}));const box=$('#cmpBox');
+ if(items.length<2){box.innerHTML=`<div class="card empty"><p>Cochez « Comparer » sur 2 à 4 annonces dans le classement.</p><p class="mut small">${items.length?'1 annonce sélectionnée pour l’instant.':''}</p><a href="#liste">Aller au classement</a></div>`;return}
+ const DR={A:1,B:2,C:3,D:4,E:5,F:6,G:7};
+ const rows=[['Score',x=>x.c.score,'max',v=>v+'/100'],['Prix',x=>x.l.price,'min',eur],['Surface réelle',x=>x.c.real,'max',v=>num(v)+' m²'],['Prix/m² réel',x=>x.c.ppm2,'min',v=>eur(v)+'/m²'],['Écart vs moyenne arr.',x=>x.c.ratio==null?null:x.c.ratio-1,'min',pct],['Arrondissement',x=>x.l.arr,null,v=>arrL(v)],['Pièces / chambres',x=>x.l.rooms,'max',(v,x)=>num(v)+' p. / '+num(x.l.bedrooms)+' ch.'],
+  ['Étage',x=>x.c.sub.etage,'max',(v,x)=>nz(x.l.floor)?(x.l.floor===0?'RDC':arrL(x.l.floor))+(x.l.lift===true?', ascenseur':x.l.lift===false?', sans ascenseur':''):'–'],['DPE / GES',x=>DR[x.l.dpe]??null,'min',(v,x)=>`${x.l.dpe?`<span class="dpe d-${x.l.dpe}">${x.l.dpe}</span>`:'?'} / ${x.l.ges?`<span class="dpe d-${x.l.ges}">${x.l.ges}</span>`:'?'}`],
+  ['Lumière',x=>x.c.sub.lumiere,'max',(v,x)=>esc([x.l.expo,x.l.traversant?'traversant':null].filter(Boolean).join(', ')||(v==null?'?':Math.round(v*100)+'/100'))],['Extérieur',x=>x.l.outdoor||0,'max',(v,x)=>x.l.outdoorType?esc(x.l.outdoorType)+(nz(x.l.outdoor)?' '+num(x.l.outdoor)+' m²':''):'Aucun'],['Parking',x=>x.l.parking?1:0,'max',(v,x)=>x.l.parking?'Oui':x.l.parking===false?'Non':'?'],
+  ['Charges/mois',x=>x.l.charges,'min',eur],['Distance',x=>x.c.km,'min',v=>num(v)+' km'],['Frais de notaire',x=>x.c.notary,null,eur],['Travaux estimés',x=>x.c.renov,'min',eur],['Coût total',x=>x.c.total,'min',eur],['Mensualité',x=>x.c.monthly,'min',eur],
+  ['Alertes',x=>x.c.flags.filter(f=>f.lvl!=='info').length,'min',(v,x)=>x.c.flags.filter(f=>f.lvl!=='info').map(f=>`<span class="fl ${f.lvl}">${esc(f.txt)}</span>`).join(' ')||'Aucune'],['Ma note',x=>x.l.rating,'max',v=>v?'★'.repeat(v):'–'],['Statut',x=>x.l.status,null,v=>ST[v]||'']];
+ box.innerHTML=`<div class="card scroll"><table class="cmp"><thead><tr><th></th>${items.map(x=>`<th><button class="ttl" data-open="${esc(x.l.id)}" style="font-size:18px">${esc(x.l.title||'Annonce')}</button><br><button class="ghost small" data-rm="${esc(x.l.id)}" style="min-height:36px;margin-top:6px">Retirer</button></th>`).join('')}</tr></thead><tbody>${rows.map(([lab,get,dir,fmt])=>{const vals=items.map(get);const nums=vals.filter(v=>typeof v==='number'&&!isNaN(v));const best=dir&&nums.length>1?(dir==='max'?Math.max(...nums):Math.min(...nums)):null;
+  return`<tr><th>${lab}</th>${items.map((x,i)=>{const v=vals[i];const isB=best!=null&&v===best&&nums.filter(n=>n===best).length<nums.length;return`<td class="${isB?'best':''}">${v==null&&!['Étage','DPE / GES','Lumière','Extérieur','Parking','Pièces / chambres','Alertes'].includes(lab)?'–':fmt(v,x)}</td>`}).join('')}</tr>`}).join('')}</tbody></table></div><p class="mut small">En vert : la meilleure valeur de chaque ligne.</p>`}
+$('#cmpBox').addEventListener('click',e=>{const o=e.target.closest('[data-open]');if(o){openD(o.dataset.open);return}const r=e.target.closest('[data-rm]');if(r){S.cmp=S.cmp.filter(x=>x!==r.dataset.rm);saveS();renderAll()}});
+
+/* ---------- réglages ---------- */
+function fillSettings(){
+ $('#wBox').innerHTML=Object.keys(W0).map(k=>`<div class="sl"><label for="w-${k}">${WL[k]}</label><input type="range" id="w-${k}" data-w="${k}" min="0" max="50" step="1" value="${+S.w[k]||0}"><em id="wv-${k}"></em></div>`).join('');wPct();
+ const F=[['fin.apport','Apport personnel (€)'],['fin.taux','Taux du crédit (%)'],['fin.duree','Durée (ans)'],['fin.assur','Assurance emprunteur (% par an)'],['not.ancien','Frais de notaire ancien (%)'],['not.neuf','Frais de notaire neuf (%)'],['renov.F','Travaux si DPE F (€/m²)'],['renov.G','Travaux si DPE G (€/m²)']];
+ $('#finBox').innerHTML=F.map(([p,lab])=>{const[a,b]=p.split('.');return`<label class="fld"><span>${lab}</span><input inputmode="decimal" data-s="${p}" value="${esc(S[a][b])}"></label>`}).join('');
+ $('#avgBox').innerHTML=Array.from({length:20},(_,i)=>`<label class="fld"><span>${arrL(i+1)}</span><input inputmode="numeric" data-avg="${i+1}" value="${esc(S.avg[i+1])}"></label>`).join('');
+ $('#wRes').textContent=S.work?`Lieu actuel : ${S.work.label||''} (${S.work.lat.toFixed(4)}, ${S.work.lng.toFixed(4)})`:'Aucun lieu défini.';fillFilters()}
+function wPct(){const ks=Object.keys(W0).filter(k=>k!=='distance'||S.work);const sum=ks.reduce((a,k)=>a+(+S.w[k]||0),0)||1;Object.keys(W0).forEach(k=>{const el=$('#wv-'+k);if(el)el.textContent=(k==='distance'&&!S.work)?'inactif':Math.round((+S.w[k]||0)/sum*100)+' %'})}
+let sT;const sUp=()=>{clearTimeout(sT);sT=setTimeout(()=>{saveS();renderAll()},350)};
+$('#wBox').addEventListener('input',e=>{const k=e.target.dataset.w;if(!k)return;S.w[k]=+e.target.value;wPct();sUp()});
+$('#bW0').onclick=()=>{S.w={...W0};saveS();fillSettings();renderAll()};
+$('#finBox').addEventListener('input',e=>{const p=e.target.dataset.s;if(!p)return;const[a,b]=p.split('.');const v=N(e.target.value);if(v==null)return;S[a][b]=v;sUp()});
+$('#avgBox').addEventListener('input',e=>{const a=e.target.dataset.avg;if(!a)return;const v=N(e.target.value);if(!v)return;S.avg[a]=v;sUp()});
+$('#bAvg0').onclick=()=>{S.avg={...AVG0};saveS();fillSettings();renderAll()};
+$('#bLoc').onclick=async()=>{const a=$('#wAddr').value.trim();const res=$('#wRes');if(!a)return;let m,w=null;const lab=a.slice(0,60);
+ if(m=a.match(/(-?\d{1,2}[.,]\d+)\s*[,;\s]\s*(-?\d{1,3}[.,]\d+)/))w={lat:N(m[1]),lng:N(m[2]),label:lab};
+ if(!w&&sampleFn&&/[a-z]{3,}/i.test(a.replace(/paris/ig,''))){res.textContent='Claude cherche l’adresse…';try{const v=await sampleFn.json(`Donne les coordonnées WGS84 approximatives de cette adresse en Île-de-France : "${a.slice(0,200)}". Réponds UNIQUEMENT en JSON : {"lat": nombre, "lng": nombre, "label": "adresse normalisée courte"} ou {"lat": null} si tu ne sais pas.`,{modelTier:'quick'});
+   if(v&&typeof v.lat==='number'&&typeof v.lng==='number'&&v.lat>48.6&&v.lat<49.1&&v.lng>2&&v.lng<2.7)w={lat:v.lat,lng:v.lng,label:String(v.label||a).slice(0,60)+' (position approximative)'}}catch(e){}}
+ if(!w){const ar=(m=a.match(/\b75(?:0(\d{2})|116)\b/))?(m[1]?+m[1]:16):(m=a.match(/paris\s*(\d{1,2})|\b(\d{1,2})\s*(?:e|er|ème|eme)\b/i))?+(m[1]||m[2]):null;if(ar>=1&&ar<=20)w={lat:CENT[ar][0],lng:CENT[ar][1],label:lab+' (centre du '+arrL(ar)+')'}}
+ if(w){S.work=w;saveS();fillSettings();renderAll()}else res.textContent='Adresse non reconnue : indiquez le code postal (750xx), « 48.87, 2.34 », ou cliquez sur la carte.'};
+
+/* ---------- export / import ---------- */
+const CSVK=['id','added','status','title','url','price','surface','carrez','included','rooms','bedrooms','floor','floorsTotal','lift','arr','quartier','dpe','ges','year','charges','outdoor','outdoorType','parking','expo','traversant','isNew','agency','renov','rating','notes','lat','lng','desc'];
+const cq=v=>{const s=v==null?'':String(v);return/[;"\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+function toCSV(){const head=[...CSVK,'score','surface_reelle','prix_m2_reel','cout_total','mensualite','alertes'];
+ return'﻿'+head.join(';')+'\n'+L.map(l=>{const c=calc(l);return[...CSVK.map(k=>BOOLK.has(k)?(l[k]==null?'':l[k]?'oui':'non'):NUMK.has(k)&&nz(l[k])?String(l[k]).replace('.',','):l[k]),c.score,c.real&&Math.round(c.real*10)/10,c.ppm2&&Math.round(c.ppm2),c.total&&Math.round(c.total),c.monthly&&Math.round(c.monthly),c.flags.map(f=>f.txt).join(' | ')].map(cq).join(';')}).join('\n')}
+function parseCSV(t){t=t.replace(/^﻿/,'');const d=(t.split('\n')[0].match(/;/g)||[]).length>=(t.split('\n')[0].match(/,/g)||[]).length?';':',';const rows=[];let r=[],f='',q=false;
+ for(let i=0;i<t.length;i++){const ch=t[i];if(q){if(ch==='"'){if(t[i+1]==='"'){f+='"';i++}else q=false}else f+=ch}else if(ch==='"')q=true;else if(ch===d){r.push(f);f=''}else if(ch==='\n'){r.push(f.replace(/\r$/,''));rows.push(r);r=[];f=''}else f+=ch}
+ if(f||r.length){r.push(f);rows.push(r)}const h=rows.shift()||[];return rows.filter(x=>x.some(Boolean)).map(x=>{const o={};h.forEach((k,i)=>{k=k.trim();if(!CSVK.includes(k))return;let v=x[i];if(v==null||v==='')return;if(NUMK.has(k))v=N(v);else if(BOOLK.has(k))v=/^(oui|true|1|yes)$/i.test(v);o[k]=v});return o})}
+async function giveFile(name,text,mime){
+ if(dlFn){try{await dlFn.save({filename:name,data:text});toast('Fichier '+name+' proposé au téléchargement');return}catch(e){try{await dlFn.save({filename:name,data:new Blob([text],{type:mime})});toast('Fichier '+name+' proposé au téléchargement');return}catch(e2){}}}
+ if(!window.claude){try{const u=URL.createObjectURL(new Blob([text],{type:mime}));const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);toast('Fichier '+name+' téléchargé');return}catch(e){}}
+ $('#expBox').innerHTML=`<p class="small">Le téléchargement n’est pas disponible ici : copiez le contenu ci-dessous et enregistrez-le sous <b>${esc(name)}</b>.</p><textarea id="expT" rows="6" readonly></textarea><button id="bCopy">Copier</button>`;$('#expT').value=text}
+$('#expBox').addEventListener('click',async e=>{if(e.target.id!=='bCopy')return;try{await navigator.clipboard.writeText($('#expT').value);toast('Copié')}catch(x){$('#expT').select();toast('Sélectionné : utilisez Copier de votre appareil')}});
+const stamp=()=>new Date().toISOString().slice(0,10);
+$('#bJson').onclick=()=>giveFile('appart-paris-'+stamp()+'.json',JSON.stringify({version:1,exported:new Date().toISOString(),L:L.map(strip),S},null,1),'application/json');
+$('#bCsv').onclick=()=>giveFile('appart-paris-'+stamp()+'.csv',toCSV(),'text/csv');
+$('#fImp').onchange=async e=>{const file=e.target.files[0];e.target.value='';if(!file)return;const t=await file.text();let items=[],ns=null;
+ try{if(/\.json$/i.test(file.name)||/^\s*[{[]/.test(t)){const d=JSON.parse(t);items=Array.isArray(d)?d:Array.isArray(d.L)?d.L:[];if(d.S)ns=d.S}else items=parseCSV(t)}catch(x){toast('Fichier illisible');return}
+ let n=0;for(const it of items){if(!it||typeof it!=='object')continue;const clean={};for(const k of [...CSVK,'check','updated','type']){if(it[k]!=null)clean[k]=it[k]}
+  if(clean.check&&typeof clean.check!=='object')delete clean.check;
+  const id=typeof clean.id==='string'&&/^[\w-]{1,40}$/.test(clean.id)?clean.id:null;const i=id?L.findIndex(x=>x.id===id):-1;
+  if(i>=0){L[i]={...L[i],...clean};saveL(L[i],true)}else{const l=mkListing(clean,{});if(id)l.id=id;L.push(l);saveL(l,true)}n++}
+ if(ns){S=mergeS({...ns,cmp:S.cmp});saveS();fillSettings()}saveLocal();renderAll();toast(n+' annonce'+(n>1?'s':'')+' importée'+(n>1?'s':''))};
+let wipeArm=false;$('#bWipe').onclick=()=>{const b=$('#bWipe');if(!wipeArm){wipeArm=true;b.textContent='Confirmer : tout supprimer ?';b.style.color='var(--red2)';setTimeout(()=>{wipeArm=false;b.textContent='Tout effacer';b.style.color=''},5000);return}
+ const old=L.slice();L.forEach(l=>cloudPut('L_'+l.id,null));L=[];S.cmp=[];saveLocal();renderAll();wipeArm=false;b.textContent='Tout effacer';b.style.color='';
+ toast('Toutes les annonces ont été supprimées',()=>{L=old;L.forEach(l=>{delete l._c;saveL(l,true)});renderAll()})};
+
+/* ---------- navigation ---------- */
+const VIEWS=['liste','carte','comparer','reglages'];
+function route(){const v=VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):'liste';VIEWS.forEach(x=>{$('#v-'+x).hidden=x!==v});$$('nav a').forEach(a=>{if(a.getAttribute('href')==='#'+v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+ if(v==='carte'){renderArrT();requestAnimationFrame(drawMap)}if(v==='comparer')renderCmp();if(v==='liste')renderList()}
+function renderAll(){cityCache.size>300&&cityCache.clear();renderList();const v=location.hash.slice(1);if(v==='carte'){renderArrT();drawMap()}if(v==='comparer')renderCmp();if(curId&&!$('#ov').hidden)liveD();wPct()}
+window.addEventListener('hashchange',route);
+fillSettings();route();
+initCloud();initCaps();
+}
+</script>
+</body>
+</html>
