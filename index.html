@@ -131,6 +131,15 @@ td.n,th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 #toast[hidden]{display:none}
 #toast button{min-height:36px;background:transparent;color:var(--bg);border-color:var(--bg)}
 .stack-sp>*+*{margin-top:16px}
+/* épargne & apport */
+.prog{height:14px;background:var(--soft);border-radius:7px;overflow:hidden;margin:10px 0 6px}
+.prog u{display:block;height:100%;background:var(--green)}
+.acc{border-top:1px solid var(--line);padding:14px 0 6px}
+.acc:first-child{border-top:0}
+.sub{font-size:19px;margin:20px 0 8px}
+.tip{background:var(--infobg);border-radius:8px;padding:10px 12px;margin:10px 0 0}
+.warn{background:var(--orgbg);color:var(--org);border-radius:8px;padding:10px 12px;margin:10px 0 0;font-weight:600}
+ul.plain{margin:6px 0;padding-left:20px}
 @media(max-width:600px){
  .two{grid-template-columns:minmax(0,1fr)}
  .item{grid-template-columns:minmax(0,1fr)}
@@ -151,7 +160,7 @@ td.n,th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
  <div class="wrap">
   <div class="plq"><span class="n">75</span><div><h1>Le vrai prix au m²</h1><p>Vos annonces nettoyées, les pièges signalés, les vraies opportunités en tête.</p></div></div>
   <nav>
-   <a href="#liste">Classement</a><a href="#carte">Carte</a><a href="#comparer">Comparer<b id="cmpN">0</b></a><a href="#reglages">Réglages</a>
+   <a href="#liste">Classement</a><a href="#carte">Carte</a><a href="#comparer">Comparer<b id="cmpN">0</b></a><a href="#epargne">Épargne &amp; apport</a><a href="#reglages">Réglages</a>
    <span id="sync">Enregistré sur cet appareil</span>
   </nav>
  </div>
@@ -195,6 +204,59 @@ td.n,th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 <section id="v-comparer" hidden>
  <h2 class="headline">Comparaison côte à côte</h2>
  <div id="cmpBox"></div>
+</section>
+
+<section id="v-epargne" hidden class="stack-sp">
+ <h2 class="headline">Épargne &amp; apport</h2>
+ <p class="mut small" style="margin-top:-6px">Outil de suivi personnel, pas un conseil financier. Les taux des livrets réglementés sont révisés le 1er février et le 1er août : vérifiez-les.</p>
+ <div class="kpis" id="epKpis"></div>
+ <div class="card">
+  <h3>Objectif d’apport</h3>
+  <div class="fgrid" id="goalBox"></div>
+  <div id="goalRes"></div>
+ </div>
+ <div class="card">
+  <h3>Mes comptes d’épargne</h3>
+  <p class="mut small">Solde, taux et plafond de chaque compte. Aucun numéro de compte ni IBAN n’est demandé ni enregistré.</p>
+  <div class="row" id="accAdd"></div>
+  <div id="accList" style="margin-top:8px"></div>
+ </div>
+ <div class="card">
+  <h3>Quand retirer ?</h3>
+  <p class="mut small">Sur les livrets, les intérêts se calculent par quinzaine (du 1er au 15, puis du 16 à la fin du mois). Un retrait cesse de rapporter dès le début de la quinzaine où il a lieu ; un versement ne rapporte qu’à partir du 1er ou du 16 qui suit. Donc : retirez le 1er ou le 16, versez le 15 ou le dernier jour du mois.</p>
+  <div class="fgrid"><label class="fld"><span>Montant à retirer (€)</span><input id="wdAmt" inputmode="decimal" placeholder="2 000"></label><label class="fld"><span>Date du retrait</span><input id="wdDate" type="date"></label></div>
+  <div id="wdRes"></div>
+ </div>
+ <div class="card">
+  <h3>Change EUR → VND</h3>
+  <p class="mut small">Taux saisis à la main, rien n’est récupéré en ligne. Vous pouvez taper 28500 ou 28,5 (en milliers).</p>
+  <p class="cond sub">Historique du taux</p>
+  <div class="row"><input type="date" id="fxDate" style="width:auto;flex:1 1 150px"><input id="fxRate" inputmode="decimal" placeholder="₫ pour 1 €, ex. 28 500" style="flex:1 1 180px"><button id="fxAdd" class="pri">Noter ce taux</button></div>
+  <div id="fxChart" style="margin-top:10px"></div>
+  <div id="fxList" class="scroll"></div>
+  <p class="cond sub">Calculer un change</p>
+  <div class="fgrid"><label class="fld"><span>Montant à changer (€)</span><input id="calcEur" inputmode="decimal" placeholder="2 000"></label><label class="fld"><span>Pris sur le compte</span><select id="calcAcc"></select></label></div>
+  <div id="calcRes"></div>
+  <p class="cond sub">Mes changes</p>
+  <div class="fgrid">
+   <label class="fld"><span>Date</span><input type="date" id="exDate"></label>
+   <label class="fld"><span>Euros débités (€)</span><input id="exEur" inputmode="decimal"></label>
+   <label class="fld"><span>Taux appliqué (₫ pour 1 €)</span><input id="exRate" inputmode="decimal"></label>
+   <label class="fld"><span>Frais (€)</span><input id="exFee" inputmode="decimal" placeholder="0"></label>
+   <label class="fld"><span>Service</span><input id="exSvc" list="svcL" placeholder="Wise, Revolut, banque…"></label>
+   <label class="fld"><span>Pris sur le compte</span><select id="exAcc"></select></label>
+  </div>
+  <datalist id="svcL"><option>Wise</option><option>Revolut</option><option>Remitly</option><option>WorldRemit</option><option>Banque (virement)</option><option>Bureau de change</option></datalist>
+  <label class="tog"><input type="checkbox" id="exDeduct" checked> Retirer ce montant du solde du compte choisi</label>
+  <div class="row"><button id="exAdd" class="pri">Enregistrer ce change</button></div>
+  <div id="exList" class="scroll" style="margin-top:10px"></div>
+  <div id="svcCmp"></div>
+ </div>
+ <div class="card">
+  <h3>Sauvegarde</h3>
+  <p class="mut small">Ces données sont enregistrées dans ce navigateur et, si la synchro est active, sur votre compte. Exportez-les de temps en temps.</p>
+  <div class="row"><button id="bJsonE">Exporter JSON</button><label class="tog" style="border:1px solid var(--line);border-radius:8px;padding:0 14px;cursor:pointer"><input type="file" id="fImpE" accept=".json,application/json" style="display:none">Importer JSON</label></div>
+ </div>
 </section>
 
 <section id="v-reglages" hidden class="stack-sp">
@@ -455,6 +517,7 @@ function applyRemote(remote,first){
   if(i<0){L.push({...r,_c:true});ch=true}else if((r.updated||0)>(L[i].updated||0)){L[i]={...r,_c:true};ch=true}else{if(!L[i]._c){L[i]._c=true}if(first&&(L[i].updated||0)>(r.updated||0))cloudPut(k,strip(L[i]))}}
  for(let i=L.length-1;i>=0;i--){const k='L_'+L[i].id;if(!remote[k]){if(first||!L[i]._c){if(!pend[k]&&!busy[k])cloudPut(k,strip(L[i]))}else if(!pend[k]&&!busy[k]){L.splice(i,1);ch=true}}}
  const rs=remote.settings;if(rs&&(rs.updated||0)>(S.updated||0)){S=mergeS(rs);ch=true;fillSettings()}else if(first&&(!rs||(S.updated||0)>(rs.updated||0)))cloudPut('settings',JSON.parse(JSON.stringify(S)));
+ epRemote(remote,first);
  if(ch){saveLocal();renderAll()}}
 async function initCloud(){
  if(!window.claude||typeof claude.use!=='function')return;
@@ -714,10 +777,218 @@ let wipeArm=false;$('#bWipe').onclick=()=>{const b=$('#bWipe');if(!wipeArm){wipe
  const old=L.slice();L.forEach(l=>cloudPut('L_'+l.id,null));L=[];S.cmp=[];saveLocal();renderAll();wipeArm=false;b.textContent='Tout effacer';b.style.color='';
  toast('Toutes les annonces ont été supprimées',()=>{L=old;L.forEach(l=>{delete l._c;saveL(l,true)});renderAll()})};
 
+/* ---------- épargne & apport ---------- */
+const EKEY='appart-paris-epargne-v1';
+const RATE_DATE='1er août 2026';
+const ACC0={livretA:{name:'Livret A',rate:1.7,cap:22950,reg:1},ldds:{name:'LDDS',rate:1.7,cap:12000,reg:1},lep:{name:'LEP',rate:2.5,cap:10000,reg:1},courant:{name:'Compte courant',rate:0,cap:null},autre:{name:'Autre',rate:0,cap:null}};
+const defE=()=>({acc:[],goal:{src:'manuel',price:450000,lid:'',pct:10,not:null,monthly:500},fx:[],ex:[],wd:{amt:'',date:''},calc:{eur:'',acc:''},updated:0});
+let E=defE();
+function mergeE(x){const d=defE();if(!x||typeof x!=='object')return d;
+ return{...d,updated:+x.updated||0,goal:{...d.goal,...(x.goal||{})},wd:{...d.wd,...(x.wd||{})},calc:{...d.calc,...(x.calc||{})},
+  acc:Array.isArray(x.acc)?x.acc.filter(a=>a&&typeof a.id==='string').map(a=>({...a,moves:Array.isArray(a.moves)?a.moves.filter(m=>m&&m.id&&m.d):[]})):[],
+  fx:Array.isArray(x.fx)?x.fx.filter(r=>r&&r.date&&+r.rate>0):[],ex:Array.isArray(x.ex)?x.ex.filter(r=>r&&r.id):[]}}
+try{const d=JSON.parse(localStorage.getItem(EKEY)||'null');if(d)E=mergeE(d)}catch(e){}
+function saveE(){E.updated=Date.now();try{localStorage.setItem(EKEY,JSON.stringify(E))}catch(e){}cloudPut('epargne',JSON.parse(JSON.stringify(E)))}
+function epRemote(remote,first){const re=remote.epargne;
+ if(re&&(+re.updated||0)>(E.updated||0)){E=mergeE(re);try{localStorage.setItem(EKEY,JSON.stringify(E))}catch(e){}if(location.hash==='#epargne')renderEp()}
+ else if(first&&E.updated&&E.updated>((re&&+re.updated)||0))cloudPut('epargne',JSON.parse(JSON.stringify(E)))}
+
+const uid=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const Nm=s=>N(String(s??'').replace(/[−–]/g,'-').replace(/[€₫]/g,''));
+const NRate=s=>{const v=Nm(s);return v==null||v<=0?null:v<1000?v*1000:v};
+const EUR2F=new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:2});
+const eur2=v=>nz(v)?EUR2F.format(v):'–';
+const VNDF=new Intl.NumberFormat('fr-FR',{maximumFractionDigits:0});
+const vnd=v=>nz(v)?VNDF.format(Math.round(v))+' ₫':'–';
+const pd=s=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||'');return m?new Date(+m[1],+m[2]-1,+m[3]):null};
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today=()=>iso(new Date());
+const fdD=d=>d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}).replace(/ 1 /,' 1er ');
+const fdS=s=>{const d=pd(s);return d?d.toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}):s};
+/* quinzaines : 1er-15 et 16-fin de mois */
+const qStart=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate()<=15?1:16);
+const qNext=d=>d.getDate()<=15?new Date(d.getFullYear(),d.getMonth(),16):new Date(d.getFullYear(),d.getMonth()+1,1);
+const accById=id=>E.acc.find(a=>a.id===id);
+
+/* Intérêts d'une année, quinzaine par quinzaine.
+   Le solde au 1er janvier = solde actuel moins les mouvements datés de l'année ou après.
+   Versement : compte à partir du 1er/16 qui suit. Retrait : ne compte plus dès le début de sa quinzaine. */
+function yearInterest(a,y,now=new Date()){
+ const r=(+a.rate||0)/100/24;const y0=new Date(y,0,1);
+ const mv=(a.moves||[]).map(m=>({d:pd(m.d),amt:+m.amt||0})).filter(m=>m.d&&m.d>=y0);
+ const b0=(+a.balance||0)-mv.reduce((s,m)=>s+m.amt,0);
+ let tot=0,earned=0;
+ for(let m=0;m<12;m++)for(const day of[1,16]){const s=new Date(y,m,day);let b=b0;
+  for(const x of mv){if(x.amt>=0){if(qNext(x.d)<=s)b+=x.amt}else if(qStart(x.d)<=s)b+=x.amt}
+  const i=Math.max(0,b)*r;tot+=i;const end=day===1?new Date(y,m,16):new Date(y,m+1,1);if(end<=now)earned+=i}
+ return{tot,earned}}
+
+/* Retrait : ordre (taux le plus bas d'abord) et intérêt gagné en attendant le début de la quinzaine suivante. */
+function wdPlan(amt,date){
+ const accs=E.acc.filter(a=>(+a.balance||0)>0).sort((a,b)=>(+a.rate||0)-(+b.rate||0)||(+a.balance||0)-(+b.balance||0));
+ let rest=amt;const parts=[];for(const a of accs){if(rest<=0)break;const p=Math.min(rest,+a.balance||0);parts.push({a,p});rest-=p}
+ const d=date.getDate(),isStart=d===1||d===16;
+ const gain=isStart?0:parts.reduce((s,x)=>s+x.p*(+x.a.rate||0)/100/24,0);
+ return{parts,short:Math.max(0,rest),isStart,stop:qStart(date),next:qNext(date),gain,inc:parts.filter(x=>x.a.inc!==false).reduce((s,x)=>s+x.p,0)}}
+
+function accHave(){return E.acc.filter(a=>a.inc!==false).reduce((s,a)=>s+(+a.balance||0),0)}
+function goalCalc(){const g=E.goal;let price=+g.price||0,lab='';
+ if(g.src==='annonce'){const l=L.find(x=>x.id===g.lid);if(l&&nz(l.price)){price=l.price;lab=l.title||'Annonce'}else price=0}
+ const notp=nz(g.not)?+g.not:+S.not.ancien;const target=price*((+g.pct||0)+notp)/100;
+ const inc=E.acc.filter(a=>a.inc!==false);const have=inc.reduce((s,a)=>s+(+a.balance||0),0);
+ const r=have>0?inc.reduce((s,a)=>s+(+a.balance||0)*(+a.rate||0),0)/have/100:0;
+ let months=null;if(target>0&&have>=target)months=0;else if(target>0){let h=have;const m=+g.monthly||0;for(let i=1;i<=600;i++){h=h*(1+r/12)+m;if(h>=target){months=i;break}}}
+ return{price,lab,notp,target,have,miss:Math.max(0,target-have),r,months}}
+const fxSorted=()=>[...E.fx].sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
+const exVnd=x=>Math.max(0,(+x.eur||0)-(+x.fee||0))*(+x.rate||0);
+
+const epOpen=new Set();
+function accHTML(a){const mv=[...(a.moves||[])].sort((x,y)=>x.d<y.d?1:x.d>y.d?-1:0);
+ return`<div class="acc" data-id="${esc(a.id)}">
+ <div class="row" style="justify-content:space-between"><h3 style="font-size:20px">${esc(a.name||'Compte')}</h3><span class="small mut" data-ai></span></div>
+ <div class="fgrid">
+  <label class="fld"><span>Nom</span><input data-a="name" value="${esc(a.name)}"></label>
+  <label class="fld"><span>Solde (€)</span><input inputmode="decimal" data-a="balance" value="${esc(a.balance??'')}"></label>
+  <label class="fld"><span>Taux (% par an)</span><input inputmode="decimal" data-a="rate" value="${esc(a.rate??'')}"></label>
+  <label class="fld"><span>Plafond de versements (€)</span><input inputmode="numeric" data-a="cap" value="${esc(a.cap??'')}" placeholder="aucun"></label>
+  <label class="fld"><span>Solde à jour le</span><input type="date" data-a="updated" value="${esc(a.updated||'')}"></label>
+ </div>
+ ${a.rdate?`<p class="mut small" style="margin:4px 0">Taux et plafond par défaut, à jour au ${esc(a.rdate)}. Taux révisés le 1er février et le 1er août.</p>`:''}
+ <label class="tog"><input type="checkbox" data-a="inc"${a.inc!==false?' checked':''}> Compter ce compte dans l’apport</label>
+ <details${epOpen.has(a.id)?' open':''} data-det><summary class="small" style="cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:600">Versements et retraits (${mv.length})</summary>
+  <p class="mut small" style="margin:0 0 8px">Chaque mouvement met le solde à jour et affine les intérêts par quinzaine. Sans mouvement saisi, le solde est supposé inchangé depuis le 1er janvier.</p>
+  <div class="row"><input type="date" data-mv="d" value="${today()}" style="width:auto;flex:1 1 150px"><input inputmode="decimal" data-mv="amt" placeholder="+500 ou -200" style="flex:1 1 140px"><button data-mvadd>Ajouter</button></div>
+  ${mv.length?`<table class="small" style="margin-top:8px"><tbody>${mv.map(m=>`<tr><td>${esc(fdS(m.d))}</td><td class="n ${m.amt<0?'bad':'good'}">${m.amt>0?'+':''}${esc(eur2(m.amt))}</td><td class="mut">${m.ex?'change EUR → VND':''}</td><td class="n"><button class="ghost" data-mvdel="${esc(m.id)}" style="min-height:36px">Supprimer</button></td></tr>`).join('')}</tbody></table>`:''}
+ </details>
+ <button class="ghost small" data-accdel style="min-height:36px;margin-top:4px">Supprimer ce compte</button>
+</div>`}
+
+function renderEp(){
+ const g=E.goal;const own=L.filter(l=>!l.sample&&nz(l.price));if(g.src==='annonce'&&!own.length)g.src='manuel';
+ $('#goalBox').innerHTML=`<label class="fld"><span>Prix visé</span><select data-g="src"><option value="manuel"${g.src!=='annonce'?' selected':''}>Saisi à la main</option>${own.length?`<option value="annonce"${g.src==='annonce'?' selected':''}>Une de mes annonces</option>`:''}</select></label>
+ ${g.src==='annonce'?`<label class="fld"><span>Annonce</span><select data-g="lid"><option value="">Choisir…</option>${own.map(l=>`<option value="${esc(l.id)}"${l.id===g.lid?' selected':''}>${esc((l.title||'Annonce').slice(0,45))} · ${eur(l.price)}</option>`).join('')}</select></label>`
+ :`<label class="fld"><span>Prix du bien (€)</span><input inputmode="numeric" data-g="price" value="${esc(g.price??'')}"></label>`}
+ <label class="fld"><span>Apport en % du prix (hors frais)</span><input inputmode="decimal" data-g="pct" value="${esc(g.pct??'')}"></label>
+ <label class="fld"><span>Frais de notaire (%)</span><input inputmode="decimal" data-g="not" value="${esc(nz(g.not)?g.not:S.not.ancien)}"></label>
+ <label class="fld"><span>Épargne mise de côté par mois (€)</span><input inputmode="numeric" data-g="monthly" value="${esc(g.monthly??'')}"></label>`;
+ $('#accAdd').innerHTML=Object.entries(ACC0).map(([k,v])=>`<button data-add="${k}">+ ${esc(v.name)}</button>`).join('');
+ $('#accList').innerHTML=E.acc.length?E.acc.map(accHTML).join(''):`<p class="mut">Aucun compte pour l’instant : ajoutez vos livrets avec les boutons ci-dessus.</p>`;
+ const opts=`<option value="">Aucun</option>`+E.acc.map(a=>`<option value="${esc(a.id)}">${esc(a.name||'Compte')}</option>`).join('');
+ $('#calcAcc').innerHTML=opts;$('#calcAcc').value=accById(E.calc.acc)?E.calc.acc:'';
+ const exA=$('#exAcc').value;$('#exAcc').innerHTML=opts;$('#exAcc').value=accById(exA)?exA:'';
+ $('#calcEur').value=E.calc.eur??'';$('#wdAmt').value=E.wd.amt??'';$('#wdDate').value=E.wd.date||today();
+ if(!$('#fxDate').value)$('#fxDate').value=today();if(!$('#exDate').value)$('#exDate').value=today();
+ const fx=fxSorted();if(!$('#exRate').value&&fx.length)$('#exRate').value=fx.at(-1).rate;
+ $('#fxList').innerHTML=fx.length?`<table class="small" style="margin-top:8px"><thead><tr><th>Date</th><th class="n">1 € =</th><th></th></tr></thead><tbody>${[...fx].reverse().slice(0,12).map(r=>`<tr><td>${esc(fdS(r.date))}</td><td class="n">${vnd(r.rate)}</td><td class="n"><button class="ghost" data-fxdel="${esc(r.date)}" style="min-height:36px">Supprimer</button></td></tr>`).join('')}</tbody></table>${fx.length>12?`<p class="mut small">${fx.length-12} taux plus anciens dans la courbe.</p>`:''}`:'';
+ const ex=[...E.ex].sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0);
+ $('#exList').innerHTML=ex.length?`<table class="small"><thead><tr><th>Date</th><th>Service</th><th class="n">Débité</th><th class="n">Taux</th><th class="n">Frais</th><th class="n">Reçu</th><th class="n">Taux réel</th><th></th></tr></thead><tbody>${ex.map(x=>{const v=exVnd(x);return`<tr><td>${esc(fdS(x.date))}</td><td>${esc(x.svc||'?')}${x.acc&&accById(x.acc)?`<br><span class="mut">${esc(accById(x.acc).name)}</span>`:''}</td><td class="n">${eur2(x.eur)}</td><td class="n">${vnd(x.rate)}</td><td class="n">${eur2(+x.fee||0)}</td><td class="n">${vnd(v)}</td><td class="n">${vnd(x.eur>0?v/x.eur:null)}</td><td class="n"><button class="ghost" data-exdel="${esc(x.id)}" style="min-height:36px">Supprimer</button></td></tr>`}).join('')}</tbody></table>`:`<p class="mut small">Aucun change enregistré.</p>`;
+ epCalc()}
+
+function fxChart(){const r=fxSorted();const box=$('#fxChart');
+ if(r.length<2){box.innerHTML=`<p class="mut small">${r.length?'Notez un deuxième taux pour voir la courbe.':'Notez le taux du jour pour commencer l’historique.'}</p>`;return}
+ const W=640,H=190,p=44;const t0=+pd(r[0].date),t1=+pd(r.at(-1).date);const v=r.map(x=>+x.rate);let lo=Math.min(...v),hi=Math.max(...v);if(hi===lo){hi+=200;lo-=200}
+ const X=t=>p+(t1>t0?(t-t0)/(t1-t0):.5)*(W-p-12),Y=val=>14+(hi-val)/(hi-lo)*(H-44);
+ const pts=r.map(x=>[X(+pd(x.date)),Y(+x.rate)].map(n=>n.toFixed(1)));const k=n=>VNDF.format(Math.round(n));
+ box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img" aria-label="Évolution du taux EUR/VND">
+ <line x1="${p}" x2="${W-12}" y1="${Y(hi)}" y2="${Y(hi)}" style="stroke:var(--line)"/><line x1="${p}" x2="${W-12}" y1="${Y(lo)}" y2="${Y(lo)}" style="stroke:var(--line)"/>
+ <text x="${p-6}" y="${Y(hi)+4}" text-anchor="end" font-size="12" style="fill:var(--mut)">${k(hi)}</text><text x="${p-6}" y="${Y(lo)+4}" text-anchor="end" font-size="12" style="fill:var(--mut)">${k(lo)}</text>
+ <polyline fill="none" points="${pts.map(q=>q.join(',')).join(' ')}" style="stroke:var(--blue2);stroke-width:2.5"/>
+ ${pts.map((q,i)=>`<circle cx="${q[0]}" cy="${q[1]}" r="4" style="fill:var(--blue2)"><title>${esc(fdS(r[i].date))} : ${vnd(r[i].rate)}</title></circle>`).join('')}
+ <text x="${p}" y="${H-6}" font-size="12" style="fill:var(--mut)">${esc(fdS(r[0].date))}</text><text x="${W-12}" y="${H-6}" text-anchor="end" font-size="12" style="fill:var(--mut)">${esc(fdS(r.at(-1).date))}</text></svg>`}
+
+function epCalc(){
+ const now=new Date(),y=now.getFullYear();let totInt=0;
+ $$('#accList .acc').forEach(el=>{const a=accById(el.dataset.id);if(!a)return;const it=yearInterest(a,y,now);totInt+=it.tot;
+  let t=`Intérêts ${y} : ≈ ${eur2(it.tot)} (dont ${eur2(it.earned)} déjà acquis), versés le 31/12`;
+  if(nz(a.cap)&&+a.cap>0){const room=+a.cap-(+a.balance||0);t+=room>0?` · encore ${eur(room)} versables`:' · plafond atteint'}
+  $('[data-ai]',el).textContent=t});
+ const gc=goalCalc();const fx=fxSorted(),last=fx.at(-1);
+ const tot=E.acc.reduce((s,a)=>s+(+a.balance||0),0);
+ $('#epKpis').innerHTML=`<div class="kpi"><b>${eur(tot)}</b><span>Épargne totale</span></div><div class="kpi"><b>${eur(gc.have)}</b><span>Comptée dans l’apport</span></div><div class="kpi"><b>${eur2(totInt)}</b><span>Intérêts ${y} estimés</span></div><div class="kpi"><b>${last?vnd(last.rate):'–'}</b><span>${last?'1 € au '+esc(fdS(last.date)):'Taux EUR/VND non noté'}</span></div>`;
+ /* objectif */
+ let gh='';
+ if(!gc.target)gh=`<p class="mut">${E.goal.src==='annonce'?'Choisissez une annonce pour fixer l’objectif.':'Indiquez un prix pour calculer l’objectif.'}</p>`;
+ else{const pc=clamp(gc.have/gc.target,0,1);const m=+E.goal.monthly||0;let fc;
+  if(gc.months===0)fc='<span class="good">Objectif atteint !</span>';
+  else if(gc.months==null)fc=`Au rythme de ${eur(m)} par mois, l’objectif n’est pas atteint en 50 ans : augmentez l’épargne mensuelle.`;
+  else{const d=new Date(now.getFullYear(),now.getMonth()+gc.months,1);fc=`Objectif atteint vers <b>${d.toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}</b> (dans ${gc.months} mois), avec ${eur(m)} par mois et ${NF.format(gc.r*100)} % de rendement moyen.`}
+  gh=`<div class="prog" role="progressbar" aria-valuenow="${Math.round(pc*100)}" aria-valuemin="0" aria-valuemax="100"><u style="width:${(pc*100).toFixed(1)}%"></u></div>
+  <div class="row" style="justify-content:space-between"><span><b class="cond" style="font-size:26px">${eur(gc.have)}</b> <span class="mut">sur ${eur(gc.target)} (${Math.round(pc*100)} %)</span></span><span>${gc.miss>0?`Il manque <b class="bad">${eur(gc.miss)}</b>`:''}</span></div>
+  <p class="mut small" style="margin:4px 0">${gc.lab?esc(gc.lab)+' : ':''}${eur(gc.price)} × (${NF.format(+E.goal.pct||0)} % d’apport + ${NF.format(gc.notp)} % de frais de notaire)</p>
+  <p style="margin:6px 0">${fc}</p>
+  <div class="row"><button id="goalToFin">Reporter ${eur(gc.have)} comme apport dans Réglages</button><span class="mut small">Apport utilisé pour le crédit : ${eur(S.fin.apport)}</span></div>`}
+ $('#goalRes').innerHTML=gh;
+ /* retrait */
+ const amt=Nm(E.wd.amt),wd=pd(E.wd.date)||new Date(now.getFullYear(),now.getMonth(),now.getDate());let wh='';
+ if(!amt||amt<=0)wh=`<p class="mut small">Indiquez un montant pour voir d’où le prendre et le meilleur jour.</p>`;
+ else if(!E.acc.length)wh=`<p class="mut small">Ajoutez d’abord vos comptes.</p>`;
+ else{const P=wdPlan(amt,wd);
+  wh=`<p class="small" style="margin:10px 0 0;font-weight:600">À prendre en priorité sur les comptes qui rapportent le moins :</p><ul class="plain">${P.parts.map(x=>`<li>${eur2(x.p)} depuis ${esc(x.a.name||'Compte')} (${NF.format(+x.a.rate||0)} %)</li>`).join('')}</ul>`;
+  if(P.short>0)wh+=`<p class="warn">Il manque ${eur2(P.short)} sur vos comptes pour ce retrait.</p>`;
+  const days=Math.round((P.next-wd)/864e5);
+  if(P.isStart)wh+=`<p class="tip">Le ${esc(fdD(wd))} est un début de quinzaine : l’argent a rapporté jusqu’à la veille. Bonne date.</p>`;
+  else if(P.gain>0)wh+=`<p class="tip">Retiré le ${esc(fdD(wd))}, cet argent ne rapporte plus depuis le ${esc(fdD(P.stop))}. En attendant le <b>${esc(fdD(P.next))}</b> (${days} jour${days>1?'s':''} de plus), vous gagnez une quinzaine d’intérêts : <b>≈ ${eur2(P.gain)}</b>.</p>`;
+  else wh+=`<p class="tip">Ces comptes ne rapportent pas d’intérêts : la date ne change rien.</p>`;
+  if(gc.target&&P.inc>0)wh+=`<p class="small mut" style="margin-top:8px">Votre apport passe de ${eur(gc.have)} à ${eur(gc.have-P.inc)} (${Math.round(clamp((gc.have-P.inc)/gc.target,0,1)*100)} % de l’objectif).</p>`;
+  wh+=`<p class="mut small">La date retenue est la date de valeur appliquée par votre banque.</p>`}
+ $('#wdRes').innerHTML=wh;
+ /* change */
+ fxChart();
+ const ce=Nm(E.calc.eur);let ch='';
+ if(!last)ch=`<p class="mut small">Notez au moins un taux pour calculer.</p>`;
+ else if(!ce||ce<=0)ch=`<p class="mut small">Indiquez un montant en euros.</p>`;
+ else{const best=fx.reduce((b,r)=>+r.rate>+b.rate?r:b,fx[0]);const v=ce*last.rate;
+  ch=`<p style="margin:10px 0 0"><b class="cond" style="font-size:26px">${vnd(v)}</b> <span class="mut">au taux du ${esc(fdS(last.date))} (${vnd(last.rate)})</span></p><p class="mut small" style="margin:2px 0">Avant frais : comparez le montant reçu annoncé par chaque service.</p>`;
+  if(+best.rate>+last.rate){const diff=ce*(best.rate-last.rate);ch+=`<p class="small">Au meilleur taux noté (${vnd(best.rate)} le ${esc(fdS(best.date))}), vous auriez reçu ${vnd(ce*best.rate)}, soit ${vnd(diff)} de plus (≈ ${eur(diff/last.rate)}).</p>`}
+  else ch+=`<p class="small good">C’est le meilleur taux de votre historique.</p>`;
+  const a=accById(E.calc.acc);
+  if(a){if(ce>(+a.balance||0))ch+=`<p class="warn">${esc(a.name)} ne contient que ${eur2(+a.balance||0)}.</p>`;
+   if(a.inc!==false&&gc.target)ch+=`<p class="small">Pris sur ${esc(a.name)}, votre apport passe de ${eur(gc.have)} à <b>${eur(gc.have-ce)}</b> (−${eur(ce)}, soit ${Math.round(ce/gc.target*100)} % de l’objectif). ${gc.target-(gc.have-ce)>0?`Il manquera ${eur(gc.target-(gc.have-ce))}.`:''}</p>`;
+   else if(a.inc===false)ch+=`<p class="small mut">${esc(a.name)} n’est pas compté dans l’apport : l’objectif ne bouge pas.</p>`;
+   if(+a.rate>0){const t=new Date(now.getFullYear(),now.getMonth(),now.getDate());const d=t.getDate();if(d!==1&&d!==16){const nx=qNext(t);ch+=`<p class="tip">Si vous retirez aujourd’hui de ${esc(a.name)}, attendre le ${esc(fdD(nx))} vous ferait gagner ≈ ${eur2(ce*(+a.rate)/100/24)} d’intérêts.</p>`}}}}
+ $('#calcRes').innerHTML=ch;
+ /* comparaison des services */
+ const by={};E.ex.forEach(x=>{const k=(x.svc||'?').trim()||'?';const kk=k.toLowerCase();(by[kk]=by[kk]||{name:k,eur:0,vnd:0,n:0});by[kk].eur+=+x.eur||0;by[kk].vnd+=exVnd(x);by[kk].n++});
+ const sv=Object.values(by).filter(s=>s.eur>0).map(s=>({...s,eff:s.vnd/s.eur})).sort((a,b)=>b.eff-a.eff);
+ $('#svcCmp').innerHTML=sv.length>1?`<p class="cond sub">Quel service donne le plus de dongs ?</p><table class="small"><thead><tr><th>Service</th><th class="n">Changes</th><th class="n">₫ reçus pour 1 € débité</th></tr></thead><tbody>${sv.map((s,i)=>`<tr><td class="${i===0?'best':''}">${esc(s.name)}</td><td class="n">${s.n}</td><td class="n ${i===0?'best':''}">${vnd(s.eff)}</td></tr>`).join('')}</tbody></table><p class="small">Pour 1 000 €, ${esc(sv[0].name)} vous a donné ${vnd((sv[0].eff-sv.at(-1).eff)*1000)} de plus que ${esc(sv.at(-1).name)}. <span class="mut">Le taux du jour joue aussi : comparez des changes faits à des dates proches.</span></p>`:''}
+
+let eT;const epUp=()=>{epCalc();clearTimeout(eT);eT=setTimeout(saveE,400)};
+const ve=$('#v-epargne');
+ve.addEventListener('input',e=>{const t=e.target;
+ if(t.dataset.g&&t.tagName==='INPUT'){E.goal[t.dataset.g]=Nm(t.value);epUp();return}
+ const el=t.closest('.acc');if(el&&t.dataset.a&&t.dataset.a!=='inc'){const a=accById(el.dataset.id);if(!a)return;const k=t.dataset.a;a[k]=k==='name'||k==='updated'?t.value:Nm(t.value);epUp();return}
+ if(t.id==='wdAmt'){E.wd.amt=t.value;epUp()}else if(t.id==='wdDate'){E.wd.date=t.value;epUp()}else if(t.id==='calcEur'){E.calc.eur=t.value;epUp()}});
+ve.addEventListener('change',e=>{const t=e.target;
+ if(t.dataset.g&&t.tagName==='SELECT'){E.goal[t.dataset.g]=t.value;saveE();renderEp();return}
+ const el=t.closest('.acc');if(el&&t.dataset.a){const a=accById(el.dataset.id);if(!a)return;if(t.dataset.a==='inc'){a.inc=t.checked;saveE();epCalc()}else if(t.dataset.a==='name'){clearTimeout(eT);saveE();renderEp()}return}
+ if(t.id==='calcAcc'){E.calc.acc=t.value;saveE();epCalc()}});
+ve.addEventListener('toggle',e=>{const d=e.target;if(!d.matches||!d.matches('[data-det]'))return;const id=d.closest('.acc')?.dataset.id;if(!id)return;if(d.open)epOpen.add(id);else epOpen.delete(id)},true);
+ve.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;const el=t.closest('.acc');const a=el?accById(el.dataset.id):null;
+ if(t.dataset.add){const p=ACC0[t.dataset.add];E.acc.push({id:uid('a'),type:t.dataset.add,name:p.name,balance:0,rate:p.rate,cap:p.cap,updated:today(),inc:t.dataset.add!=='courant',rdate:p.reg?RATE_DATE:null,moves:[]});saveE();renderEp();toast(p.name+' ajouté');return}
+ if(t.hasAttribute('data-accdel')&&a){const i=E.acc.indexOf(a);E.acc.splice(i,1);saveE();renderEp();toast(a.name+' supprimé',()=>{E.acc.splice(i,0,a);saveE();renderEp()});return}
+ if(t.hasAttribute('data-mvadd')&&a){const amt=Nm($('[data-mv=amt]',el).value),d=$('[data-mv=d]',el).value||today();if(!amt){toast('Montant invalide : +500 pour un versement, -200 pour un retrait');return}
+  a.moves=a.moves||[];a.moves.push({id:uid('m'),d,amt});a.balance=Math.round(((+a.balance||0)+amt)*100)/100;a.updated=today();epOpen.add(a.id);saveE();renderEp();return}
+ if(t.dataset.mvdel&&a){const m=(a.moves||[]).find(x=>x.id===t.dataset.mvdel);if(!m)return;a.moves=a.moves.filter(x=>x!==m);a.balance=Math.round(((+a.balance||0)-m.amt)*100)/100;
+  if(m.ex){const x=E.ex.find(z=>z.id===m.ex);if(x)x.acc=''}epOpen.add(a.id);saveE();renderEp();return}
+ if(t.id==='fxAdd'){const r=NRate($('#fxRate').value),d=$('#fxDate').value||today();if(!r){toast('Taux invalide : par exemple 28500 ou 28,5');return}
+  E.fx=E.fx.filter(x=>x.date!==d);E.fx.push({date:d,rate:r});$('#fxRate').value='';saveE();renderEp();toast('Taux du '+fdS(d)+' noté');return}
+ if(t.dataset.fxdel){E.fx=E.fx.filter(x=>x.date!==t.dataset.fxdel);saveE();renderEp();return}
+ if(t.id==='exAdd'){const eu=Nm($('#exEur').value),r=NRate($('#exRate').value),fee=Nm($('#exFee').value)||0,d=$('#exDate').value||today(),svc=$('#exSvc').value.trim().slice(0,40),accId=$('#exAcc').value;
+  if(!eu||eu<=0||!r){toast('Indiquez le montant en euros et le taux appliqué');return}
+  const x={id:uid('x'),date:d,eur:eu,rate:r,fee,svc,acc:''};const ac=accById(accId);
+  if(ac&&$('#exDeduct').checked){ac.moves=ac.moves||[];ac.moves.push({id:uid('m'),d,amt:-eu,ex:x.id});ac.balance=Math.round(((+ac.balance||0)-eu)*100)/100;ac.updated=today();x.acc=ac.id}
+  E.ex.push(x);if(!E.fx.some(z=>z.date===d))E.fx.push({date:d,rate:r});
+  $('#exEur').value='';$('#exFee').value='';saveE();renderEp();toast('Change enregistré : '+vnd(exVnd(x))+' reçus');return}
+ if(t.dataset.exdel){const x=E.ex.find(z=>z.id===t.dataset.exdel);if(!x)return;E.ex=E.ex.filter(z=>z!==x);
+  E.acc.forEach(ac=>{const m=(ac.moves||[]).find(z=>z.ex===x.id);if(m){ac.moves=ac.moves.filter(z=>z!==m);ac.balance=Math.round(((+ac.balance||0)-m.amt)*100)/100}});saveE();renderEp();return}
+ if(t.id==='goalToFin'){const h=Math.round(goalCalc().have);S.fin.apport=h;saveS();fillSettings();renderAll();epCalc();toast('Apport de '+eur(h)+' reporté dans Réglages');return}
+ if(t.id==='bJsonE'){giveFile('epargne-'+stamp()+'.json',JSON.stringify({version:1,exported:new Date().toISOString(),epargne:E},null,1),'application/json');return}});
+$('#fImpE').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const d=JSON.parse(await f.text());const src=d&&d.epargne?d.epargne:d;if(!src||!Array.isArray(src.acc))throw 0;const old=E;E=mergeE(src);saveE();renderEp();toast('Épargne importée',()=>{E=old;saveE();renderEp()})}catch(x){toast('Fichier illisible')}};
+
 /* ---------- navigation ---------- */
-const VIEWS=['liste','carte','comparer','reglages'];
+const VIEWS=['liste','carte','comparer','epargne','reglages'];
 function route(){const v=VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):'liste';VIEWS.forEach(x=>{$('#v-'+x).hidden=x!==v});$$('nav a').forEach(a=>{if(a.getAttribute('href')==='#'+v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
- if(v==='carte'){renderArrT();requestAnimationFrame(drawMap)}if(v==='comparer')renderCmp();if(v==='liste')renderList()}
+ if(v==='carte'){renderArrT();requestAnimationFrame(drawMap)}if(v==='comparer')renderCmp();if(v==='epargne')renderEp();if(v==='liste')renderList()}
 function renderAll(){cityCache.size>300&&cityCache.clear();renderList();const v=location.hash.slice(1);if(v==='carte'){renderArrT();drawMap()}if(v==='comparer')renderCmp();if(curId&&!$('#ov').hidden)liveD();wPct()}
 window.addEventListener('hashchange',route);
 fillSettings();route();
