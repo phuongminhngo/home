@@ -122,6 +122,7 @@ td.n,th.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 .stars button{font-size:24px;min-width:44px;padding:0;border:0;background:none;color:var(--line)}
 .stars button.on{color:#e0a400}
 .fig{position:relative;min-height:440px}.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.mtip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);padding:7px 11px;border-radius:8px;font-size:14px;line-height:1.35;white-space:nowrap;z-index:2;box-shadow:0 4px 14px rgba(0,0,0,.25)}.mtip[hidden]{display:none}.mtip b{font:700 17px "Barlow Condensed"}
 .sl{display:grid;grid-template-columns:minmax(0,15em) minmax(0,1fr) 4.5em;gap:10px;align-items:center;padding:4px 0}
 .sl input{min-height:30px;padding:0}
 .sl em{font-style:normal;text-align:right;font-variant-numeric:tabular-nums}
@@ -204,9 +205,9 @@ ol.src{font-size:13px;color:var(--mut);padding-left:22px}ol.src li{margin:3px 0}
 
 <section id="v-carte" hidden>
  <h2 class="headline">Où sont les opportunités</h2>
- <p class="mut">Chaque cercle est un arrondissement : taille selon le nombre d’annonces, couleur selon le meilleur score. Touchez un cercle pour filtrer le classement.</p>
+ <p class="mut">Chaque cercle est un arrondissement : taille selon le nombre d’annonces, couleur selon le meilleur score. Survolez un cercle pour voir le prix moyen de référence ; touchez-le pour filtrer le classement.</p>
  <div class="row" style="margin:10px 0"><button id="bWork">Placer mon lieu de référence sur la carte</button><span class="mut small" id="workTxt"></span></div>
- <div class="card"><div class="fig" id="mapfig"><svg id="map" role="img" aria-label="Carte des arrondissements de Paris"></svg></div></div>
+ <div class="card"><div class="fig" id="mapfig"><svg id="map" role="img" aria-label="Carte des arrondissements de Paris"></svg><div id="mapTip" class="mtip" hidden></div></div></div>
  <div class="card scroll" style="margin-top:16px"><table id="arrT"></table></div>
 </section>
 
@@ -978,7 +979,8 @@ $('#dl').addEventListener('click',e=>{const l=byId(curId);if(!l)return;const t=e
 const OUT=[[48.9016,2.32],[48.9017,2.37],[48.8955,2.399],[48.8785,2.411],[48.853,2.4155],[48.8345,2.413],[48.8228,2.39],[48.8158,2.3605],[48.8178,2.332],[48.8255,2.3],[48.8345,2.276],[48.8455,2.2615],[48.858,2.255],[48.8712,2.2605],[48.8805,2.279],[48.8875,2.2935],[48.8965,2.3045]];
 const SEINE=[[48.8345,2.257],[48.848,2.2775],[48.8578,2.2925],[48.863,2.31],[48.8605,2.33],[48.857,2.3465],[48.8525,2.3595],[48.8445,2.3705],[48.835,2.384],[48.8275,2.395],[48.8195,2.412]];
 let workMode=false;const mapSvg=$('#map');let proj=null;
-function drawMap(){const W=mapSvg.clientWidth,H=mapSvg.clientHeight;if(!W||!H)return;const k=.658,lo0=2.247,lo1=2.42,la0=48.812,la1=48.906;
+let mapStats={};
+function drawMap(){mapStats={};const W=mapSvg.clientWidth,H=mapSvg.clientHeight;if(!W||!H)return;const k=.658,lo0=2.247,lo1=2.42,la0=48.812,la1=48.906;
  const sc=Math.min((W-30)/((lo1-lo0)*k),(H-30)/(la1-la0));const ox=(W-(lo1-lo0)*k*sc)/2,oy=(H-(la1-la0)*sc)/2;
  const P=(la,lg)=>[ox+(lg-lo0)*k*sc,oy+(la1-la)*sc];proj={P,inv:(x,y)=>({lat:la1-(y-oy)/sc,lng:lo0+(x-ox)/(k*sc)})};
  const by={};shown().forEach(l=>{if(!l.arr)return;const c=calc(l);(by[l.arr]=by[l.arr]||[]).push(c)});
@@ -987,18 +989,25 @@ function drawMap(){const W=mapSvg.clientWidth,H=mapSvg.clientHeight;if(!W||!H)re
  h+=`<polyline points="${SEINE.map(p=>P(p[0],p[1]).join(',')).join(' ')}" style="fill:none;stroke:#7fb2da;stroke-width:${small?5:8};stroke-linecap:round;stroke-linejoin:round;opacity:.75"/>`;
  for(let a=1;a<=20;a++){const[x,y]=P(...CENT[a]);const cs=by[a]||[];const n=cs.length;const best=n?Math.max(...cs.filter(c=>!c.grave).map(c=>c.score),-1):-1;
   const col=!n?'var(--card)':best<0?'var(--red)':best>=70?'var(--green)':best>=50?'var(--blue)':'#6b7280';const r=(small?13:17)+Math.min(n,6)*(small?2:3);
-  const pref=S.f.arrs.includes(a);
-  h+=`<g data-arr="${a}" style="cursor:pointer"><circle cx="${x}" cy="${y}" r="${r}" style="fill:${col};stroke:${pref?'var(--ink)':'var(--line)'};stroke-width:${pref?3:1.5}"/><text x="${x}" y="${y+(n?-1:5)}" text-anchor="middle" style="fill:${n?'#fff':'var(--ink)'};font:700 ${small?13:16}px 'Barlow Condensed'">${arrL(a)}</text>${n?`<text x="${x}" y="${y+13}" text-anchor="middle" style="fill:#fff;font:600 11px Barlow">${n} ann.</text>`:''}</g>`}
+  const pref=S.f.arrs.includes(a);const ok=cs.filter(c=>!c.grave),pp=ok.map(c=>c.ppm2).filter(Boolean).sort((u,v)=>u-v);mapStats[a]={n,med:pp.length?pp[Math.floor(pp.length/2)]:null,x,y,r};
+  h+=`<g data-arr="${a}" style="cursor:pointer" aria-label="${arrL(a)} : prix moyen de référence ${eur(+S.avg[a])} le m²"><circle cx="${x}" cy="${y}" r="${r}" style="fill:${col};stroke:${pref?'var(--ink)':'var(--line)'};stroke-width:${pref?3:1.5}"/><text x="${x}" y="${y+(n?-1:5)}" text-anchor="middle" style="fill:${n?'#fff':'var(--ink)'};font:700 ${small?13:16}px 'Barlow Condensed'">${arrL(a)}</text>${n?`<text x="${x}" y="${y+13}" text-anchor="middle" style="fill:#fff;font:600 11px Barlow">${n} ann.</text>`:''}</g>`}
  if(S.work){const[x,y]=P(S.work.lat,S.work.lng);h+=`<g pointer-events="none"><path d="M${x},${y} l-9,-16 a10,10 0 1,1 18,0 z" style="fill:var(--red);stroke:#fff;stroke-width:2"/><circle cx="${x}" cy="${y-21}" r="3.5" fill="#fff"/>${small?'':`<text x="${x+14}" y="${y-18}" style="fill:var(--ink);font:600 13px Barlow">${esc((S.work.label||'Lieu de référence').slice(0,40))}</text>`}</g>`}
  mapSvg.innerHTML=h}
 const mapRO=new ResizeObserver(()=>{if(!$('#v-carte').hidden)drawMap()});mapRO.observe(mapSvg);
 mapSvg.addEventListener('click',e=>{const rect=mapSvg.getBoundingClientRect();
  if(workMode&&proj){const p=proj.inv(e.clientX-rect.left,e.clientY-rect.top);S.work={lat:+p.lat.toFixed(5),lng:+p.lng.toFixed(5),label:'Point choisi sur la carte'};workMode=false;$('#bWork').textContent='Placer mon lieu de référence sur la carte';saveS();renderAll();toast('Lieu de référence placé');return}
  const g=e.target.closest('[data-arr]');if(g){S.f.arrs=[+g.dataset.arr];saveS();fillFilters();location.hash='liste';toast('Filtré sur le '+arrL(+g.dataset.arr))}});
+function mapTipShow(a,cx,cy){const t=$('#mapTip'),st=mapStats[a];if(!st)return;const avg=+S.avg[a];
+ t.innerHTML=`<b>${arrL(a)}</b><br>Prix moyen réf. : ${eur(avg)}/m²${st.n?`<br>${st.n} annonce${st.n>1?'s':''}${st.med?` · médiane ${eur(st.med)}/m²${st.med<avg?' <span style="color:var(--ok)">▼</span>':''}`:''}`:''}`;
+ t.hidden=false;const F=$('#mapfig').getBoundingClientRect(),w=t.offsetWidth,h=t.offsetHeight;
+ let x=cx-w/2,y=cy-st.r-h-10;if(y<4)y=cy+st.r+10;x=clamp(x,4,F.width-w-4);t.style.left=x+'px';t.style.top=y+'px'}
+mapSvg.addEventListener('pointerover',e=>{if(e.pointerType==='touch')return;const g=e.target.closest('[data-arr]');if(g){const st=mapStats[+g.dataset.arr];if(st)mapTipShow(+g.dataset.arr,st.x,st.y)}});
+mapSvg.addEventListener('pointerout',e=>{const g=e.target.closest('[data-arr]');if(g&&!g.contains(e.relatedTarget))$('#mapTip').hidden=true});
+mapSvg.addEventListener('pointerleave',()=>{$('#mapTip').hidden=true});
 $('#bWork').onclick=()=>{workMode=!workMode;$('#bWork').textContent=workMode?'Touchez la carte à l’endroit voulu…':'Placer mon lieu de référence sur la carte'};
 function renderArrT(){const by={};shown().forEach(l=>{if(l.arr)(by[l.arr]=by[l.arr]||[]).push(calc(l))});
- $('#arrT').innerHTML=`<thead><tr><th>Arr.</th><th class="n">Prix moyen réf.</th><th class="n">Annonces</th><th class="n">Médiane annonces</th><th class="n">Meilleur score</th></tr></thead><tbody>${Array.from({length:20},(_,i)=>{const a=i+1,cs=by[a]||[];const ok=cs.filter(c=>!c.grave);const pp=ok.map(c=>c.ppm2).filter(Boolean).sort((x,y)=>x-y);const med=pp.length?pp[Math.floor(pp.length/2)]:null;const best=ok.length?Math.max(...ok.map(c=>c.score)):null;
- return`<tr><td>${arrL(a)}</td><td class="n">${eur(+S.avg[a])}</td><td class="n">${cs.length||''}</td><td class="n">${med?eur(med)+(med<+S.avg[a]?' <span class="good">▼</span>':''):''}</td><td class="n">${best!=null?best:''}</td></tr>`}).join('')}</tbody>`;
+ $('#arrT').innerHTML=`<thead><tr><th>Arr.</th><th class="n">Annonces</th><th class="n">Médiane annonces</th><th class="n">Meilleur score</th></tr></thead><tbody>${Array.from({length:20},(_,i)=>{const a=i+1,cs=by[a]||[];const ok=cs.filter(c=>!c.grave);const pp=ok.map(c=>c.ppm2).filter(Boolean).sort((x,y)=>x-y);const med=pp.length?pp[Math.floor(pp.length/2)]:null;const best=ok.length?Math.max(...ok.map(c=>c.score)):null;
+ return`<tr><td>${arrL(a)}</td><td class="n">${cs.length||''}</td><td class="n">${med?eur(med)+(med<+S.avg[a]?' <span class="good">▼</span>':''):''}</td><td class="n">${best!=null?best:''}</td></tr>`}).join('')}</tbody>`;
  $('#workTxt').textContent=S.work?'Référence : '+(S.work.label||'point choisi'):'Aucun lieu de référence : la distance n’entre pas dans le score.'}
 
 /* ---------- comparaison ---------- */
