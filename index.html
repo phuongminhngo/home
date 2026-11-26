@@ -284,7 +284,6 @@ table{font-size:14px}
 .lang{display:flex;gap:2px;align-items:center;padding:8px 6px 0}
 .lang button{min-height:26px;padding:0 8px;font-size:12px;color:var(--mut)}
 .lang button[aria-pressed=true]{background:var(--hover);color:var(--ink);font-weight:600}
-#trSt{font-size:11px;color:var(--mut);margin-left:4px}
 @media(max-width:860px){.lang{padding:0 0 0 6px}}
 .why{font-size:13.5px;color:var(--ink);margin-top:4px}
 #comT input,#comT select{min-height:30px;font-size:13.5px}
@@ -324,7 +323,7 @@ table{font-size:14px}
   <a href="#coach">Coach</a>
   <a href="#reglages">Réglages</a>
  </nav>
- <div class="lang" role="group" aria-label="Langue / Language" data-notr><button data-lang="fr">FR</button><button data-lang="en">EN</button><span id="trSt"></span></div>
+ <div class="lang" id="langSlot" role="group" aria-label="Langue / Language / Ngôn ngữ" data-noi18n></div>
  <span id="sync">Enregistré sur cet appareil</span>
 </aside>
 <main class="wrap">
@@ -1504,7 +1503,7 @@ HOW TO ANSWER
 6. Point out risks, hidden costs, deadlines and scams.
 7. End with 1 to 3 concrete next steps I can do this week.
 8. Never use the em dash character.
-9. Answer in ${LANG==='en'?'English':'French'} unless I write my question in another language. Format with short paragraphs, bullet or numbered lists and **bold**; no tables. If my app data contradicts my profile, point it out.
+9. Answer in ${LANG==='en'?'English':LANG==='vi'?'Vietnamese':'French'} unless I write my question in another language. Format with short paragraphs, bullet or numbered lists and **bold**; no tables. If my app data contradicts my profile, point it out.
 
 LIVE DATA FROM MY APP (today ${today()})
 ${coachData()}
@@ -1518,9 +1517,9 @@ function mdLite(t){const inl=s=>s.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');let h=''
  if(list)h+=`</${list}>`;return h}
 const CX_SUG=['Où placer mon apport en attendant d’acheter ?','Fais-moi un budget mensuel','Combien pourrai-je emprunter avec un CDI ?','Que préparer avant la fin de mon alternance ?','Is my top listing a good deal?'];
 let cxBusy=false,cxCtrl=null;
-function cxA(m){return m.content?mdLite(m.content)+(m.err?`<p class="err">${esc(m.err)}</p>`:''):(m.err?`<p class="err">${esc(m.err)}</p>`:(LANG==='en'?'<p class="mut">Thinking…</p>':'<p class="mut">Réflexion…</p>'))}
+function cxA(m){return m.content?mdLite(m.content)+(m.err?`<p class="err">${esc(m.err)}</p>`:''):(m.err?`<p class="err">${esc(m.err)}</p>`:(LANG==='en'?'<p class="mut">Thinking…</p>':LANG==='vi'?'<p class="mut">Đang suy nghĩ…</p>':'<p class="mut">Réflexion…</p>'))}
 function renderCx(){
- $('#cxLog').innerHTML=CX.msgs.length?CX.msgs.map(m=>m.role==='user'?`<div class="cx-u">${esc(m.content)}</div>`:`<div class="cx-a">${cxA(m)}</div>`).join(''):(LANG==='en'?'<p class="mut">Ask anything about your money, budget or purchase. Claude knows your profile and the figures in the app.</p>':`<p class="mut">Posez une question sur votre argent, votre budget ou votre achat. Claude connaît votre profil et les chiffres de l’app.</p>`);
+ $('#cxLog').innerHTML=CX.msgs.length?CX.msgs.map(m=>m.role==='user'?`<div class="cx-u">${esc(m.content)}</div>`:`<div class="cx-a">${cxA(m)}</div>`).join(''):(LANG==='en'?'<p class="mut">Ask anything about your money, budget or purchase. Claude knows your profile and the figures in the app.</p>':LANG==='vi'?'<p class="mut">Hãy hỏi về tiền, ngân sách hoặc việc mua nhà. Claude biết hồ sơ của bạn và các số liệu trong ứng dụng.</p>':`<p class="mut">Posez une question sur votre argent, votre budget ou votre achat. Claude connaît votre profil et les chiffres de l’app.</p>`);
  $('#cxSug').innerHTML=CX.msgs.length?'':CX_SUG.map(s=>`<button data-sug="${esc(s)}">${esc(s)}</button>`).join('');
  if($('#cxProf')!==document.activeElement)$('#cxProf').value=CX.prof;
  $('#cxData').textContent=coachData();
@@ -1543,46 +1542,9 @@ vc.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
 $('#cxQ').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();cxSend(e.target.value)}});
 $('#cxProf').addEventListener('input',e=>{CX.prof=e.target.value;saveCx()});
 
-/* ---------- langue (FR / EN) ---------- */
-const LKEY='appart-paris-lang',TKEY='appart-paris-tr-en';
-let LANG='fr';try{LANG=localStorage.getItem(LKEY)==='en'?'en':'fr'}catch(e){}
-let TR={};try{TR=JSON.parse(localStorage.getItem(TKEY)||'{}')||{}}catch(e){}
-const DICT={'Annonces':'Listings','Budget':'Budget','Épargne':'Savings','Placements':'Investments','Coach':'Coach','Réglages':'Settings','Classement':'Ranking','Carte':'Map','Comparer':'Compare','Le vrai prix au m²':'The real price per m²','Enregistré sur cet appareil':'Saved on this device','Synchronisé sur vos appareils':'Synced across your devices','+ Ajouter une annonce':'+ Add a listing','Extraire les champs':'Extract fields','Extraire avec Claude':'Extract with Claude','Saisie manuelle':'Manual entry','Filtres et tri':'Filters and sorting','Détail':'Details','Voir l’annonce':'View listing','Fermer':'Close','Supprimer':'Delete','Envoyer':'Send','Arrêter':'Stop','Nouvelle conversation':'New conversation','Coach argent':'Money coach','Mon profil':'My profile','Ce que Claude voit de l’app':'What Claude sees from the app','annonces suivies':'listings tracked','suspectes signalées':'flagged as suspicious','meilleur score':'best score','À visiter':'To visit','Visitée':'Visited','Offre faite':'Offer made','Rejetée':'Rejected','Exemple':'Sample','Comparaison côte à côte':'Side-by-side comparison','Où sont les opportunités':'Where the deals are','Combien coûte vraiment l’achat ?':'What does buying really cost?','Résultat':'Result','Détail des coûts':'Cost breakdown','Exporter JSON':'Export JSON','Exporter CSV':'Export CSV','Importer JSON':'Import JSON','Tout effacer':'Delete everything','Annuler':'Undo','Ajouter':'Add','Mes comptes d’épargne':'My savings accounts','Objectif d’apport':'Apport goal','Quand retirer ?':'When to withdraw?','Sauvegarde':'Backup','Ancien':'Older','Neuf / VEFA':'New-build / VEFA','Saisie libre':'Free entry','Oui':'Yes','Non':'No','Non précisé':'Not specified','Comparer ':'Compare ','Score':'Score','Prix':'Price','Coût total':'Total cost','Mensualité':'Monthly payment'};
-const TRIED=new Set(),ORIG=new WeakMap(),TATTR=['placeholder','aria-label','title'];
-const hasWord=t=>/[A-Za-zÀ-ÿ]{2,}/.test(t);
-const trGet=t=>DICT[t]??TR[t];
-let trBusy=false,trT=null,trF=null,trFail=0,trWait=0;
-function trWalk(fn){const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){const p=n.parentElement;if(!p||p.closest('script,style,textarea,pre,.cx-log,[data-notr]'))continue;fn(n,p)}}
-function applyEn(){if(LANG!=='en')return;const need=new Set();
- trWalk((n,p)=>{const o=ORIG.get(n);if(o&&n.nodeValue===o.en)return;const src=n.nodeValue,t=src.trim();if(!t||t.length>1800||!hasWord(t))return;
-  const en=trGet(t);if(en!=null){const out=src.replace(t,en);ORIG.set(n,{fr:src,en:out});n.nodeValue=out}else if(!p.closest('[hidden]')&&!TRIED.has(t))need.add(t)});
- $$('[placeholder],[aria-label],[title]').forEach(el=>{if(el.closest('[data-notr]'))return;for(const a of TATTR){if(!el.hasAttribute(a))continue;const v=el.getAttribute(a);if(v===el.getAttribute('data-en-'+a))continue;const t=v.trim();if(!hasWord(t))continue;
-  const en=trGet(t);if(en!=null){el.setAttribute('data-fr-'+a,v);el.setAttribute('data-en-'+a,en);el.setAttribute(a,en)}else if(!el.closest('[hidden]')&&!TRIED.has(t))need.add(t)}});
- trObs.takeRecords();
- if(need.size){clearTimeout(trF);trF=setTimeout(()=>trFetch([...need]),900)}}
-function restoreFr(){trWalk(n=>{const o=ORIG.get(n);if(o&&n.nodeValue===o.en)n.nodeValue=o.fr});
- $$('[data-fr-placeholder],[data-fr-aria-label],[data-fr-title]').forEach(el=>{for(const a of TATTR){const fr=el.getAttribute('data-fr-'+a);if(fr==null)continue;if(el.getAttribute(a)===el.getAttribute('data-en-'+a))el.setAttribute(a,fr);el.removeAttribute('data-fr-'+a);el.removeAttribute('data-en-'+a)}});trObs.takeRecords()}
-async function trFetch(list){if(trBusy||LANG!=='en'||trFail>2)return;
- if(!sampleFn){if(trWait++<6)setTimeout(()=>trFetch(list),1500);else $('#trSt').textContent='';return}
- trBusy=true;$('#trSt').textContent='…';
- list=list.filter(t=>trGet(t)==null&&!TRIED.has(t));
- while(list.length&&LANG==='en'){const batch=[];let len=0;while(list.length&&batch.length<40&&len<6000){const t=list.shift();batch.push(t);len+=t.length}
-  batch.forEach(t=>TRIED.add(t));
-  try{const r=await sampleFn.json(`Translate each French UI string from a personal web app (buying an apartment in Paris, savings, budget, investments) into natural, concise English.
-Rules: keep every number, amount, date, %, € and symbol exactly as written; keep official French names as they are (Livret A, LDDS, LEP, PEL, PEA, DPE, GES, Loi Carrez, CAF, APL, SMIC, Prêt Paris Logement, PTZ, VEFA); keep leading and trailing punctuation; if a string is a proper name or already English, return it unchanged; never use the em dash character.
-Return ONLY a JSON array of exactly ${batch.length} strings, in the same order.
-${JSON.stringify(batch)}`,{modelTier:'quick'});
-   if(Array.isArray(r))batch.forEach((t,i)=>{if(typeof r[i]==='string'&&r[i].trim())TR[t]=r[i].replace(/—/g,',')})}
-  catch(e){trFail++;if(e&&e.code==='not_granted')trFail=9;break}}
- let k=Object.keys(TR);if(k.length>4000){k.slice(0,k.length-3000).forEach(x=>delete TR[x])}
- try{localStorage.setItem(TKEY,JSON.stringify(TR))}catch(e){}
- trBusy=false;$('#trSt').textContent=trFail>2?'traduction indisponible':'';applyEn()}
-const trObs=new MutationObserver(()=>{if(LANG!=='en')return;clearTimeout(trT);trT=setTimeout(applyEn,120)});
-trObs.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['hidden']});
-function setLang(l){LANG=l;try{localStorage.setItem(LKEY,l)}catch(e){}document.documentElement.lang=l;
- $$('.lang [data-lang]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===l));
- if(l==='en'){trFail=0;trWait=0;route();applyEn()}else{restoreFr();renderAll();route()}}
-$('.lang').addEventListener('click',e=>{const b=e.target.closest('[data-lang]');if(b&&b.dataset.lang!==LANG)setLang(b.dataset.lang)});
+/* ---------- langue : la traduction FR / EN / VI est faite par i18n.js ---------- */
+let LANG='fr';
+document.addEventListener('applang',e=>{LANG=e.detail||'fr';if(location.hash==='#coach')renderCx()});
 
 /* ---------- navigation ---------- */
 const VIEWS=['liste','carte','comparer','coach','budget','epargne','placement','reglages'];
@@ -1593,8 +1555,9 @@ function renderAll(){cityCache.size>300&&cityCache.clear();renderList();const v=
 window.addEventListener('hashchange',route);
 fillSettings();if(!L.length)$('#addBox').open=true;route();
 initCloud();initCaps();
-$$('.lang [data-lang]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===LANG));if(LANG==='en'){document.documentElement.lang='en';applyEn()}
+
 }
 </script>
+<script src="i18n.js"></script>
 </body>
 </html>
