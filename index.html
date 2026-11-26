@@ -799,7 +799,7 @@ function flags(l,c){
   if(l.arr==null&&l.commune&&norm(l.commune)!=='paris'&&!ext)add('grave','Commune '+l.commune+' non suivie');
   if(l.arr==null&&!l.commune)add('alerte','Arrondissement ou commune inconnu')}
  if(!nz(l.price)||!c.real)add('alerte','Prix ou surface manquant');
- if(c.ppm2!=null&&(c.ppm2<3000||c.ppm2>30000))add('grave','Prix/m² incohérent ('+eur(c.ppm2)+'/m²)');
+ if(c.ppm2!=null&&(c.ppm2<Math.min(3000,c.avg*0.4)||c.ppm2>30000))add('grave','Prix/m² incohérent ('+eur(c.ppm2)+'/m²)');
  if(nz(l.surface)&&l.surface>300&&nz(l.rooms)&&l.rooms<=3)add('grave','Surface suspecte : '+num(l.surface)+' m² pour '+l.rooms+' pièce'+(l.rooms>1?'s':''));
  if(c.real&&c.real<9)add('alerte','Moins de 9 m² : non habitable');
  if(nz(l.included)&&l.included>0)add('info','Extérieur de '+num(l.included)+' m² retiré : prix/m² sur '+num(c.real)+' m²');
