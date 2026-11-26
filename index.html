@@ -269,6 +269,14 @@ table{font-size:14px}
 #toast{left:auto;right:20px;bottom:20px;transform:none;font-size:14px;padding:8px 14px;border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.18)}
 #toast button{min-height:28px;border:1px solid var(--bg);color:var(--bg)}
 .item{animation:none!important}
+.cx-log{display:grid;gap:16px;margin:8px 0 12px}
+.cx-u{justify-self:end;background:var(--side);border-radius:8px;padding:8px 12px;max-width:80%;white-space:pre-wrap}
+.cx-a{line-height:1.65;font-size:15px}
+.cx-a h4{font-size:15px;margin:14px 0 4px}.cx-a p{margin:6px 0}.cx-a ul,.cx-a ol{margin:6px 0;padding-left:22px}.cx-a li{margin:3px 0}
+.cx-a .err{color:var(--red2);font-size:14px}
+.cx-sug{display:flex;flex-wrap:wrap;gap:6px}.cx-sug button{border:1px solid var(--line);font-size:13px;min-height:30px}
+.cx-in textarea{min-height:84px}
+#cxData{white-space:pre-wrap;background:var(--side);padding:10px 12px;border-radius:6px;max-height:320px;overflow:auto;font:13px/1.5 ui-monospace,Menlo,monospace}
 @media(max-width:860px){
  .side{position:sticky;top:0;inset:auto;width:auto;height:auto;flex-direction:row;align-items:center;padding:6px 8px;border-right:0;border-bottom:1px solid var(--line)}
  .brand{padding:0 6px 0 0}.brand div,.side .grp,#sync{display:none}
@@ -293,7 +301,7 @@ table{font-size:14px}
   <p class="grp">Annonces</p>
   <a href="#liste">Classement</a><a href="#carte">Carte</a><a href="#comparer">Comparer<b id="cmpN">0</b></a>
   <p class="grp">Argent</p>
-  <a href="#budget">Budget achat</a><a href="#epargne">Épargne &amp; apport</a><a href="#placer">Placer l’apport</a><a href="#placement">Recherche placement</a>
+  <a href="#coach">Coach</a><a href="#budget">Budget achat</a><a href="#epargne">Épargne &amp; apport</a><a href="#placer">Placer l’apport</a><a href="#placement">Recherche placement</a>
   <p class="grp">Compte</p>
   <a href="#reglages">Réglages</a>
  </nav>
@@ -340,6 +348,17 @@ table{font-size:14px}
 <section id="v-comparer" hidden>
  <h2 class="headline">Comparaison côte à côte</h2>
  <div id="cmpBox"></div>
+</section>
+
+<section id="v-coach" hidden class="stack-sp">
+ <h2 class="headline">Coach argent</h2>
+ <p class="mut small" style="margin-top:-6px">Claude répond avec votre profil, les données de l’app (épargne, objectif d’apport, budget, annonces) et une base de connaissances à jour au 26 novembre 2026. Ce n’est pas un conseil financier agréé : vérifiez les points importants auprès d’un professionnel.</p>
+ <div id="cxLog" class="cx-log" aria-live="polite"></div>
+ <div class="cx-sug" id="cxSug"></div>
+ <div class="cx-in"><textarea id="cxQ" rows="3" placeholder="Posez votre question, en français ou en anglais… (Entrée pour envoyer, Maj+Entrée pour aller à la ligne)"></textarea>
+  <div class="row" style="margin-top:8px"><button class="pri" id="cxSend">Envoyer</button><button id="cxStop" hidden>Arrêter</button><span style="flex:1"></span><button class="ghost" id="cxClear">Nouvelle conversation</button></div></div>
+ <details class="filt"><summary>Mon profil <span class="mut small" style="margin-left:8px">enregistré dans ce navigateur uniquement</span></summary><textarea id="cxProf" rows="11" style="margin:6px 0"></textarea><p class="mut small" style="margin:0 0 8px">Modifiez librement : Claude le relit à chaque question. Il n’est pas synchronisé sur votre compte.</p></details>
+ <details class="filt"><summary>Ce que Claude voit de l’app</summary><pre id="cxData" class="small"></pre></details>
 </section>
 
 <section id="v-budget" hidden class="stack-sp">
@@ -1520,10 +1539,112 @@ vb.addEventListener('change',e=>{const t=e.target;
  else if(t.id==='bgPPL'){B.ppl=t.checked;saveB();bCalc()}});
 vb.addEventListener('click',e=>{if(e.target.id!=='bgToFin')return;S.fin={...S.fin,apport:+B.apport||0,taux:+B.taux||0,duree:+B.duree||25,assur:+B.assur||0};saveS();fillSettings();renderAll();toast('Hypothèses reportées dans Réglages : mensualités du classement mises à jour')});
 
+/* ---------- coach ---------- */
+const CKEY='appart-paris-coach-v1';
+const PROF0=`- I live in Paris and work in <your job> on <your contract type>.
+- Net monthly income: <amount>. Rent and fixed costs: <amounts>.
+- Savings today: <amount and which accounts>.
+- My big goal: buy an apartment in Paris, best value per m2. I track listings in this app.
+- I'm a beginner in personal finance and investing. I accept <how much> loss on money meant for the apport.`;
+const KB=`SETTLING IN PARIS
+- Proof of address (justificatif de domicile) under 3 months unlocks most procedures. FranceConnect logs into government sites.
+- Securite sociale (ameli.fr): carte Vitale, declare a medecin traitant or refunds are lower. Private employers must offer a mutuelle and pay at least half.
+- impots.gouv.fr: declare income online every spring, even when nothing is owed. CAF: claim APL as soon as a lease is signed (not paid backwards).
+- Bank: online banks usually have no fees. Avoid overdraft, revolving credit and pay-later. France has no credit score: banks read the last 3 months of statements.
+- Renting: Paris rent control, rent without charges capped at the reference rent + 20% (loyer de reference majore), rules extended to 31 July 2027. Insee: half of Paris private tenants spend over 34% of income on rent. Deposit max 1 month unfurnished, 2 months furnished. Lease 3 years unfurnished, 1 year furnished; notice 1 month in Paris. Home insurance mandatory for tenants. Visale: free guarantor from Action Logement if eligible. Never pay before visiting and signing.
+- Navigo pass: 90.80 EUR a month in 2026 (998.80 a year), employer refunds half; 93.40 planned for 2027. Metro ticket 2.55 EUR. Taxe d'habitation no longer applies to a main home.
+
+MONEY BASICS
+- Payslip: brut before contributions; net avant impot about 22% less for a private employee; net paye after tax at source. SMIC since 1 June 2026: 1,867.02 EUR gross, about 1,477.93 EUR net (35 h).
+- Contrat d'apprentissage: salary is income-tax free up to the yearly SMIC (check your own case).
+- Order: emergency fund of 3 to 6 months of expenses, then tax-free savings accounts, then investing only money not needed for 8+ years.
+- Income tax 2026 (2025 income, per share): 0% to 11,600; 11% to 29,579; 30% to 84,577; 41% to 181,917; 45% above. Rates apply by slice. Tax is taken at source; a neutral rate (taux neutre) is possible.
+- Savings: LEP 2.5% net, limit 10,000, income limit applies. Livret A 1.7%, limit 22,950. LDDS 1.7%, limit 12,000. All tax-free, available anytime. Rates revised 1 Feb and 1 Aug. Interest counted by fortnight: deposit by the 15th or month end, withdraw on the 1st or 16th.
+- Fonds euros (assurance vie): capital guaranteed, 2.63% average in 2025 before social charges, money back in a few days, light tax after 8 years. PEL: 2% gross, locked 4 years, taxed. Interest elsewhere is taxed at the 31.4% flat tax in 2026.
+- Stocks and ETFs (PEA, limit 150,000, light tax after 5 years) can fall 50%+: never for the house apport. Opening a PEA early with a small amount starts its 5-year clock.
+- A late payment can lead to a Banque de France listing that blocks loans. A PER cuts income tax but locks money until retirement.
+
+BUYING A HOME IN PARIS
+- Needs: stable contract (ideally a CDI past its trial period), apport covering at least notary fees, loan payments at most 35% of net income including insurance (HCSF), max 25 years. Banks rarely lend on an alternance alone.
+- Notary fees (frais de notaire), paid by the buyer, mostly taxes: about 7% to 8% for older homes, 2% to 3% for new-build. Example: 500,000 EUR older flat in Paris, about 36,000 EUR. Ideal apport: fees + 10% of the price. Deposit at the compromis: 5% to 10%. Loan guarantee about 1% to 1.5% of the loan, plus file fees, maybe broker fees.
+- Mortgage rates November 2026, rising: about 3.60% over 15 years, 3.80% over 20, 4% over 25. Borrower insurance can be taken outside the bank (delegation d'assurance). Brokers: Pretto, Meilleurtaux, Cafpi.
+- Aids: Pret Paris Logement 0%, 24,200 EUR for one person or 39,600 for two or more, over 15 years, needs 1 year of main residence in Paris and income limits. PTZ not available for older flats in Paris (only zones B2 and C for older homes). Action Logement loan for employees of private firms with 10+ staff. First-time buyers pay a lower transfer-tax rate.
+- Finding: SeLoger, Bien'ici, LeBonCoin, PAP (private sellers, no agency fee); instant alerts; local agencies; immobilier.notaires.fr and 36h immo; check real sale prices on DVF (app.dvf.etalab.gouv.fr).
+- Process: agreement in principle, written offer, compromis de vente (10 days to withdraw), loan with condition suspensive de pret, acte authentique 2 to 3 months later.
+- Checks: DPE (avoid F and G unless priced in), last 3 PV d'AG, charges, works fund and voted works, Loi Carrez surface, diagnostics. Owner costs: taxe fonciere at about 20.5% Paris rate (roughly 500 to 800 EUR a year for a studio, more for bigger flats), condo charges, works budget.
+
+Rules stated from general knowledge (deposit caps, lease lengths, HCSF 35%, 10-day withdrawal, apprentice tax exemption) should be confirmed on service-public.fr.`;
+let CX={msgs:[],prof:PROF0};
+try{const d=JSON.parse(localStorage.getItem(CKEY)||'null');if(d&&typeof d==='object'){CX={msgs:Array.isArray(d.msgs)?d.msgs.filter(m=>m&&(m.role==='user'||m.role==='assistant')&&typeof m.content==='string'):[],prof:typeof d.prof==='string'?d.prof:PROF0}}}catch(e){}
+const saveCx=()=>{try{localStorage.setItem(CKEY,JSON.stringify({msgs:CX.msgs.slice(-30),prof:CX.prof}))}catch(e){}};
+function coachData(){const out=[];
+ const tot=E.acc.reduce((s,a)=>s+(+a.balance||0),0);
+ out.push('Savings accounts: '+(E.acc.length?E.acc.map(a=>`${a.name||'Account'} ${Math.round(+a.balance||0)} EUR at ${+a.rate||0}%${a.inc===false?' (not counted in apport)':''}`).join('; ')+` (total ${Math.round(tot)} EUR)`:'none entered in the app'));
+ const gc=goalCalc();if(gc.target)out.push(`Apport goal: ${Math.round(gc.target)} EUR (${NF.format(+E.goal.pct||0)}% of ${Math.round(gc.price)} EUR + ${NF.format(gc.notp)}% notary fees), counted so far ${Math.round(gc.have)} EUR, saving ${Math.round(+E.goal.monthly||0)} EUR a month`);
+ out.push(`Loan settings in app: apport ${Math.round(+S.fin.apport||0)} EUR, rate ${S.fin.taux}%, ${S.fin.duree} years, insurance ${S.fin.assur}%/yr`);
+ if(+B.price){const p=bPlan(+B.price);out.push(`Budget simulator: price ${Math.round(B.price)} EUR (${B.neuf?'new':'older'}), total cost ${Math.round(p.total)} EUR, loan ${Math.round(p.loan)} EUR, monthly ${Math.round(p.month)} EUR${p.endet!=null?`, debt ratio ${NF.format(p.endet*100)}%`:''}`)}
+ const own=L.filter(l=>!l.sample).map(l=>({l,c:calc(l)})).sort((a,b)=>b.c.score-a.c.score);
+ out.push(own.length?`Saved listings: ${own.length}. Top ${Math.min(5,own.length)}:\n`+own.slice(0,5).map(({l,c})=>`  - ${arrL(l.arr)} arr., ${Math.round(l.price||0)} EUR, ${c.real?NF.format(c.real)+' m2':'surface ?'}, ${c.ppm2?Math.round(c.ppm2)+' EUR/m2':''}${c.ratio?` (${Math.round((c.ratio-1)*100)}% vs area average)`:''}, DPE ${l.dpe||'?'}, score ${c.score}/100${c.flags.filter(f=>f.lvl==='grave').length?', red flags: '+c.flags.filter(f=>f.lvl==='grave').map(f=>f.txt).join(', '):''}`).join('\n'):'Saved listings: none yet');
+ const fx=fxSorted().at(-1);if(fx)out.push(`Last EUR/VND rate noted: 1 EUR = ${Math.round(fx.rate)} VND (${fx.date})`);
+ return out.join('\n')}
+function cxSys(){return`ROLE
+You are my personal money coach for life in Paris. Think like a patient French financial adviser, a notary and a housing expert at once, explaining things to a complete beginner. You are not a licensed adviser: give me the facts and the trade-offs so I can decide, and tell me when I need a real professional (notary, broker, accountant, lawyer).
+
+ABOUT ME
+${CX.prof.slice(0,4000)}
+
+HOW TO ANSWER
+1. Start with the direct answer in one or two sentences, then the details.
+2. Use real numbers. Show the calculation when there is one. Use euros and French terms, with the English meaning in brackets the first time.
+3. Use the knowledge base below as your starting point. If something may have changed since 26 November 2026, say so and tell me which official site to check (service-public.fr, impots.gouv.fr, ameli.fr, caf.fr, anil.org, notaires.fr).
+4. Never invent a figure. If you don't know, say so.
+5. Order advice by priority for a beginner: protect (emergency fund, insurance) before saving, saving before investing.
+6. Point out risks, hidden costs, deadlines and scams.
+7. End with 1 to 3 concrete next steps I can do this week.
+8. Never use the em dash character.
+9. Answer in the language of my question. Format with short paragraphs, bullet or numbered lists and **bold**; no tables. If my app data contradicts my profile, point it out.
+
+LIVE DATA FROM MY APP (today ${today()})
+${coachData()}
+
+KNOWLEDGE BASE (as of 26 November 2026)
+${KB}`}
+function mdLite(t){const inl=s=>s.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');let h='',list=null;
+ for(const ln of esc(t).split('\n')){const m=ln.match(/^\s*(?:[-*•]|(\d+)[.)])\s+(.*)/);
+  if(m){const k=m[1]?'ol':'ul';if(list!==k){if(list)h+=`</${list}>`;h+=`<${k}>`;list=k}h+=`<li>${inl(m[2])}</li>`;continue}
+  if(list){h+=`</${list}>`;list=null}const hd=ln.match(/^#{1,4}\s+(.*)/);if(hd)h+=`<h4>${inl(hd[1])}</h4>`;else if(ln.trim())h+=`<p>${inl(ln)}</p>`}
+ if(list)h+=`</${list}>`;return h}
+const CX_SUG=['Où placer mon apport en attendant d’acheter ?','Fais-moi un budget mensuel','Combien pourrai-je emprunter avec un CDI ?','Que préparer avant la fin de mon alternance ?','Is my top listing a good deal?'];
+let cxBusy=false,cxCtrl=null;
+function cxA(m){return m.content?mdLite(m.content)+(m.err?`<p class="err">${esc(m.err)}</p>`:''):(m.err?`<p class="err">${esc(m.err)}</p>`:'<p class="mut">Réflexion…</p>')}
+function renderCx(){
+ $('#cxLog').innerHTML=CX.msgs.length?CX.msgs.map(m=>m.role==='user'?`<div class="cx-u">${esc(m.content)}</div>`:`<div class="cx-a">${cxA(m)}</div>`).join(''):`<p class="mut">Posez une question sur votre argent, votre budget ou votre achat. Claude connaît votre profil et les chiffres de l’app.</p>`;
+ $('#cxSug').innerHTML=CX.msgs.length?'':CX_SUG.map(s=>`<button data-sug="${esc(s)}">${esc(s)}</button>`).join('');
+ if($('#cxProf')!==document.activeElement)$('#cxProf').value=CX.prof;
+ $('#cxData').textContent=coachData();
+ $('#cxSend').disabled=cxBusy;$('#cxStop').hidden=!cxBusy}
+async function cxSend(q){q=String(q||'').trim();if(!q||cxBusy)return;
+ if(!sampleFn){toast('Claude n’est pas disponible dans cette vue');return}
+ CX.msgs.push({role:'user',content:q});const a={role:'assistant',content:''};CX.msgs.push(a);$('#cxQ').value='';cxBusy=true;renderCx();
+ const hist=CX.msgs.slice(0,-1).slice(-12);while(hist.length&&hist[0].role!=='user')hist.shift();
+ const input=hist.map((m,i)=>({role:m.role,content:i===0?cxSys()+'\n\nMY QUESTION\n'+m.content:m.content}));
+ const last=()=>$$('#cxLog .cx-a').at(-1);cxCtrl=new AbortController();
+ try{const r=await sampleFn(input,{modelTier:'default',cache:false,signal:cxCtrl.signal,onText:({text})=>{a.content=text;const el=last();if(el)el.innerHTML=cxA(a)}});a.content=(r&&r.text)||a.content}
+ catch(e){if(e&&e.text)a.content=e.text;a.err=e&&e.code==='rate_limited'?'Claude est occupé, réessayez dans un instant.':e&&e.code==='not_granted'?'Accès à Claude refusé pour cette page.':cxCtrl.signal.aborted?'Réponse arrêtée.':'Réponse interrompue, réessayez.'}
+ cxBusy=false;cxCtrl=null;saveCx();renderCx();last()?.scrollIntoView({block:'start',behavior:'smooth'})}
+const vc=$('#v-coach');
+vc.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
+ if(t.dataset.sug){cxSend(t.dataset.sug);return}
+ if(t.id==='cxSend')cxSend($('#cxQ').value);
+ else if(t.id==='cxStop'){if(cxCtrl)cxCtrl.abort()}
+ else if(t.id==='cxClear'){if(cxBusy)return;const old=CX.msgs;CX.msgs=[];saveCx();renderCx();toast('Conversation effacée',()=>{CX.msgs=old;saveCx();renderCx()})}});
+$('#cxQ').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();cxSend(e.target.value)}});
+$('#cxProf').addEventListener('input',e=>{CX.prof=e.target.value;saveCx()});
+
 /* ---------- navigation ---------- */
-const VIEWS=['liste','carte','comparer','budget','epargne','placer','placement','reglages'];
+const VIEWS=['liste','carte','comparer','coach','budget','epargne','placer','placement','reglages'];
 function route(){const v=VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):'liste';VIEWS.forEach(x=>{$('#v-'+x).hidden=x!==v});$$('nav a').forEach(a=>{if(a.getAttribute('href')==='#'+v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
- if(v==='carte'){renderArrT();requestAnimationFrame(drawMap)}if(v==='comparer')renderCmp();if(v==='budget')renderBudget();if(v==='epargne')renderEp();if(v==='placement')renderPl();if(v==='liste')renderList()}
+ if(v==='carte'){renderArrT();requestAnimationFrame(drawMap)}if(v==='comparer')renderCmp();if(v==='coach')renderCx();if(v==='budget')renderBudget();if(v==='epargne')renderEp();if(v==='placement')renderPl();if(v==='liste')renderList()}
 function renderAll(){cityCache.size>300&&cityCache.clear();renderList();const v=location.hash.slice(1);if(v==='carte'){renderArrT();drawMap()}if(v==='comparer')renderCmp();if(curId&&!$('#ov').hidden)liveD();wPct()}
 window.addEventListener('hashchange',route);
 fillSettings();route();
