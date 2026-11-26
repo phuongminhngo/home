@@ -4,9 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Appart Paris, vrai prix</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /* VOICE: practical and calm, a buyer's notebook you can read standing in a stairwell
    IDEA: the Paris enamel street plaque; every score is a numbered house plaque
@@ -164,19 +161,148 @@ ol.src{font-size:13px;color:var(--mut);padding-left:22px}ol.src li{margin:3px 0}
 }
 @media(prefers-reduced-motion:no-preference){.item{animation:in .35s ease both}@keyframes in{from{opacity:0;transform:translateY(6px)}}}
 </style>
+<style>
+/* RESTYLE (Notion-like): quiet sidebar, one system sans, white page, gray secondary text,
+   no card borders, property rows that look like text until hovered, soft pastel tags, side panel for details */
+:root{--font:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;
+--bg:light-dark(#fff,#191919);--card:light-dark(#fff,#191919);--side:light-dark(#f7f7f5,#202020);--ink:light-dark(#37352f,#d4d4d4);--mut:light-dark(#787774,#9b9b9b);
+--line:light-dark(#e9e9e7,#2f2f2f);--soft:light-dark(#efefed,#2c2c2c);--hover:light-dark(#efefed,#2c2c2c);
+--blue:#2383e2;--blue2:light-dark(#2383e2,#529cca);--green:#448361;--ok:light-dark(#448361,#4dab9a);--red:#d44c47;--red2:light-dark(#d44c47,#e57f78);--org:light-dark(#b7791f,#ffa344);
+--orgbg:light-dark(#fadec9,#5c3b23);--redbg:light-dark(#ffe2dd,#5c2a26);--infobg:light-dark(#f1f1ef,#252525);
+--t-gray:light-dark(#e3e2e0,#373737);--t-green:light-dark(#dbeddb,#2b593f);--t-blue:light-dark(#d3e5ef,#28456c);--t-red:light-dark(#ffe2dd,#6e3630)}
+body{font:15px/1.55 var(--font);background:var(--bg);-webkit-font-smoothing:antialiased}
+h1,h2,h3,.cond{font-family:var(--font);font-weight:600;letter-spacing:-.01em;line-height:1.25}
+h2{font-size:20px}h3{font-size:16px}
+.side{position:fixed;inset:0 auto 0 0;width:240px;background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:12px 8px;z-index:10;overflow-y:auto}
+.brand{display:flex;gap:10px;align-items:center;padding:6px 8px 14px}
+.logo{flex:none;width:28px;height:28px;border-radius:6px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-weight:700;font-size:13px}
+.brand b{display:block;font-size:14px}.brand small{display:block;color:var(--mut);font-size:12px}
+.side nav{display:flex;flex-direction:column;gap:1px;overflow:visible;align-items:stretch}
+.side .grp{margin:14px 8px 4px;font-size:12px;font-weight:600;color:var(--mut)}
+.side nav a{color:var(--ink);text-decoration:none;padding:5px 8px;border-radius:5px;font-size:14px;font-weight:500;min-height:30px;display:flex;align-items:center;gap:6px;opacity:.82;background:none}
+.side nav a:hover{background:var(--hover);opacity:1}
+.side nav a[aria-current]{background:var(--hover);color:var(--ink);opacity:1;font-weight:600}
+.side nav b{background:var(--t-gray);color:var(--mut);border-radius:4px;padding:0 6px;font-size:12px;margin-left:auto}
+#sync{margin-top:auto;padding:10px 8px 4px;font-size:12px;color:var(--mut);opacity:1}
+main.wrap{max-width:none;margin:0 0 0 240px;padding:56px clamp(20px,6vw,96px) 96px}
+main>section{max-width:940px;margin:0 auto}
+.ptitle{font-size:36px;font-weight:700;margin:0;letter-spacing:-.02em}
+.psub{color:var(--mut);margin:6px 0 28px}
+main>section>h2.headline:first-child{font-size:36px;font-weight:700;margin:0 0 10px;letter-spacing:-.02em}
+.headline{font-size:20px;font-weight:600;margin:36px 0 12px}
+#hl{font-size:18px}
+.stack-sp>*+*{margin-top:28px}
+.card{background:transparent;border:0;border-radius:0;padding:0}
+.card>h3,.card>h2{margin-bottom:8px}
+.stack-sp>.card,.two>.card,main>section>.card.scroll{padding-top:20px;border-top:1px solid var(--line)}
+.card.add{background:var(--side);border-radius:8px;padding:18px 20px;border:0}
+.card.add h2{font-size:16px}
+.two{gap:32px}
+.kpis{gap:8px}
+.kpi{background:var(--side);border:0;border-radius:6px;padding:10px 14px}
+.kpi b{font:600 22px/1.2 var(--font);letter-spacing:-.01em}
+.kpi span{font-size:12.5px}
+.big{font:700 clamp(26px,4vw,34px)/1.1 var(--font);letter-spacing:-.02em}
+button{min-height:32px;padding:0 10px;border:0;border-radius:5px;background:transparent;color:var(--ink);font-weight:500;font-size:14px}
+button:hover{background:var(--hover)}
+button.pri{background:var(--blue);color:#fff}
+button.pri:hover{background:#0b6bcb}
+button.ghost{color:var(--mut)}
+#bgToFin,#goalToFin,#bW0,#bAvg0,#bJson,#bCsv,#bJsonE,#bWipe,#bLoc,#bWork,#dRe,#bAI,#accAdd button,[data-psc]:not(.pri){border:1px solid var(--line)}
+input,select,textarea{min-height:32px;border:1px solid transparent;border-radius:5px;background:transparent;padding:4px 8px;font-size:15px}
+input:hover,select:hover{background:var(--hover)}
+input:focus,select:focus,textarea:focus{background:var(--bg);border-color:var(--line);box-shadow:0 0 0 2px light-dark(#2383e233,#529cca44);outline:0}
+textarea{border-color:var(--line);background:var(--bg)}
+.fgrid{grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),1fr));column-gap:32px;row-gap:0;margin:6px 0}
+.fld{display:grid;grid-template-columns:minmax(0,46%) minmax(0,1fr);align-items:center;gap:8px;font-size:14px;color:var(--mut);min-height:36px}
+.fld>span{line-height:1.3}
+.fld.got input,.fld.got select{border-color:transparent;box-shadow:inset 2px 0 0 var(--ok)}
+.row>.fld{display:flex;flex-direction:column;align-items:stretch}
+details.filt{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:4px 0}
+details.filt summary{min-height:36px;font-weight:500;font-size:14px}
+.chip{min-height:28px;border-radius:4px;background:var(--t-gray);font-size:13px;padding:0 8px}
+.chip[aria-pressed=true]{background:var(--blue);color:#fff}
+.tog{min-height:36px;font-size:14px}
+.tog input{width:16px;min-height:16px;height:16px;accent-color:var(--blue)}
+ol#list{gap:0;border-top:1px solid var(--line)}
+.item{border:0!important;border-bottom:1px solid var(--line)!important;border-radius:0;padding:14px 6px!important;gap:14px;grid-template-columns:64px minmax(0,1fr)}
+.item:hover{background:var(--side)}
+.plate{width:auto;padding:2px 0 0;border:0;outline:0;box-shadow:none;background:none!important;text-align:left}
+.plate b{display:inline-block;font:600 15px/1 var(--font);padding:4px 7px;border-radius:4px}
+.plate .rk{display:block;font-size:11px;color:var(--mut)!important;opacity:1;margin-top:5px}
+.plate small{display:none}
+.s-hi b{background:var(--t-green);color:light-dark(#1c3829,#d9f0e1)}
+.s-mid b{background:var(--t-blue);color:light-dark(#183347,#d5e7f7)}
+.s-lo b{background:var(--t-gray);color:var(--ink)}
+.s-bad b{background:var(--t-red);color:light-dark(#5d1715,#fbdad5)}
+.ttl{font:600 16px/1.35 var(--font)}
+.arrb{background:var(--t-gray);color:var(--ink);border-radius:4px;font-weight:500;font-size:12.5px;padding:1px 6px}
+.nums .p{font:600 17px/1.2 var(--font)}
+.nums{gap:2px 14px;font-size:14px}
+.meta{font-size:13.5px}
+.fl{font-size:12px;font-weight:500;border-radius:4px;padding:1px 6px}
+.fl.info{background:var(--t-gray);color:var(--ink)}
+.exb{background:var(--t-gray);color:var(--mut)}
+.acts{gap:4px}
+.acts select{min-height:30px;font-size:13px;background:var(--t-gray)}
+.dpe{border-radius:4px;font-size:12px;min-width:22px;line-height:20px}
+th{font-size:12.5px;font-weight:500;color:var(--mut)}
+td,th{padding:7px 10px;border-bottom:1px solid var(--line)}
+table{font-size:14px}
+.cmp th:first-child,.cmp td:first-child,.res td:first-child,.res th:first-child{background:var(--bg)}
+.tip{background:var(--infobg);border-radius:6px;padding:10px 14px;font-size:14px}
+.warn{background:var(--orgbg);color:light-dark(#49290e,#fce2cc);border-radius:6px;font-weight:500;font-size:14px}
+.prog{height:6px;border-radius:3px;background:var(--t-gray)}
+.prog u{background:var(--ok)}
+.tag.f{background:var(--t-blue);color:var(--ink)}.tag.i{background:var(--orgbg);color:var(--ink)}
+.seg button{border:1px solid var(--line);min-height:30px;font-size:13px}
+.stars button{min-width:32px;font-size:20px;border:0}
+#ov{justify-content:flex-end;padding:0;background:rgba(15,15,15,.25)}
+#dl{width:min(760px,100%);min-height:100%;border-radius:0;box-shadow:-8px 0 24px rgba(0,0,0,.12);background:var(--bg)}
+#dl .dh{background:var(--bg);color:var(--ink);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2;padding:14px 20px}
+#dl .dh h2{font-size:20px}
+#dClose{color:var(--ink)!important;border:1px solid var(--line)!important}
+.dbody{padding:20px;gap:24px}
+.bar i{height:6px;background:var(--t-gray)}
+.bar i u{background:var(--blue2)}
+#fxChart svg{max-height:200px}
+#toast{left:auto;right:20px;bottom:20px;transform:none;font-size:14px;padding:8px 14px;border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.18)}
+#toast button{min-height:28px;border:1px solid var(--bg);color:var(--bg)}
+.item{animation:none!important}
+@media(max-width:860px){
+ .side{position:sticky;top:0;inset:auto;width:auto;height:auto;flex-direction:row;align-items:center;padding:6px 8px;border-right:0;border-bottom:1px solid var(--line)}
+ .brand{padding:0 6px 0 0}.brand div,.side .grp,#sync{display:none}
+ .side nav{flex-direction:row;overflow-x:auto;gap:2px}
+ .side nav a{flex:none;white-space:nowrap}
+ main.wrap{margin:0;padding:28px 16px 80px}
+ .ptitle,main>section>h2.headline:first-child{font-size:28px}
+}
+@media(max-width:600px){
+ .fld{grid-template-columns:minmax(0,1fr);gap:2px;padding:4px 0}
+ .fld input,.fld select{border-color:var(--line)}
+ .item{grid-template-columns:minmax(0,1fr)}
+ .plate{display:flex;gap:8px;align-items:center}
+ .plate .rk{margin:0}
+}
+</style>
 </head>
 <body>
-<header>
- <div class="wrap">
-  <div class="plq"><span class="n">75</span><div><h1>Le vrai prix au m²</h1><p>Vos annonces nettoyées, les pièges signalés, les vraies opportunités en tête.</p></div></div>
-  <nav>
-   <a href="#liste">Classement</a><a href="#carte">Carte</a><a href="#comparer">Comparer<b id="cmpN">0</b></a><a href="#epargne">Épargne &amp; apport</a><a href="#placer">Où placer</a><a href="#placement">Recherche placement</a><a href="#reglages">Réglages</a>
-   <span id="sync">Enregistré sur cet appareil</span>
-  </nav>
- </div>
-</header>
+<aside class="side">
+ <div class="brand"><span class="logo">75</span><div><b>Appart Paris</b><small>Le vrai prix au m²</small></div></div>
+ <nav>
+  <p class="grp">Annonces</p>
+  <a href="#liste">Classement</a><a href="#carte">Carte</a><a href="#comparer">Comparer<b id="cmpN">0</b></a>
+  <p class="grp">Argent</p>
+  <a href="#budget">Budget achat</a><a href="#epargne">Épargne &amp; apport</a><a href="#placer">Placer l’apport</a><a href="#placement">Recherche placement</a>
+  <p class="grp">Compte</p>
+  <a href="#reglages">Réglages</a>
+ </nav>
+ <span id="sync">Enregistré sur cet appareil</span>
+</aside>
 <main class="wrap">
 <section id="v-liste">
+ <h1 class="ptitle">Classement</h1>
+ <p class="psub">Vos annonces nettoyées, les pièges signalés, les vraies opportunités en tête.</p>
  <div class="card add">
   <h2>Ajouter une annonce</h2>
   <p class="mut small" style="margin:4px 0 0">Collez l’URL SeLoger et, idéalement, tout le texte de l’annonce (titre, prix, surface, description, DPE, étage, adresse). Rien n’est récupéré automatiquement sur SeLoger.</p>
@@ -214,6 +340,32 @@ ol.src{font-size:13px;color:var(--mut);padding-left:22px}ol.src li{margin:3px 0}
 <section id="v-comparer" hidden>
  <h2 class="headline">Comparaison côte à côte</h2>
  <div id="cmpBox"></div>
+</section>
+
+<section id="v-budget" hidden class="stack-sp">
+ <h2 class="headline">Combien coûte vraiment l’achat ?</h2>
+ <p class="mut small" style="margin-top:-6px">Estimation, pas une offre de prêt ni un conseil financier. Frais de notaire calculés avec le barème parisien 2026, taux du marché relevés le 26 novembre 2026. Faites confirmer par un notaire et un courtier.</p>
+ <div class="two">
+  <div class="card"><h3>Le bien et votre situation</h3>
+   <div class="fgrid" id="bgIn" style="margin-top:10px"></div>
+   <p class="mut small" style="margin:6px 0">Taux moyens en novembre 2026 : 3,60 % sur 15 ans, 3,80 % sur 20 ans, 4 % sur 25 ans (PAP, 8 novembre 2026). Les banques limitent la durée à 25 ans.</p>
+   <label class="tog"><input type="checkbox" id="bgPrimo"> Premier achat de résidence principale (droits de mutation réduits)</label>
+   <label class="tog"><input type="checkbox" id="bgPPL"> Prêt Paris Logement à 0 % sur 15 ans</label>
+   <p class="mut small" style="margin:0">Prêt Paris Logement : 24 200 € pour une personne seule, 39 600 € pour un ménage de deux personnes ou plus, sous conditions de revenus et avec 1 an de résidence principale à Paris. Le PTZ de l’État ne finance pas l’ancien à Paris.</p>
+  </div>
+  <div class="card"><h3>Résultat</h3><div id="bgRes"></div></div>
+ </div>
+ <div class="card scroll"><h3>Détail des coûts</h3><table id="bgT" style="margin-top:8px"></table><p class="mut small">Frais de notaire : droits de mutation de Paris (taux réduit pour un premier achat), émoluments au barème officiel + TVA, contribution de sécurité immobilière 0,1 %, débours estimés à 1 200 €. Pour le neuf, les droits sont de 0,715 % du prix hors taxes (prix TTC divisé par 1,2 ici).</p></div>
+ <div class="card"><h3>Prix maximum avec vos revenus</h3><div id="bgMax" style="margin-top:8px"></div></div>
+ <div class="card"><h3>Pas compté ici, à prévoir aussi</h3>
+  <ul class="plain small">
+   <li>Taxe foncière (chaque année) et charges de copropriété (chaque mois)</li>
+   <li>Gros travaux de copropriété déjà votés : demandez qui les paie, vous ou le vendeur</li>
+   <li>Frais de courtier si vous passez par un courtier</li>
+   <li>Déménagement, meubles, ouverture des compteurs</li>
+   <li>Une épargne de précaution à garder après l’achat (quelques mois de dépenses)</li>
+  </ul>
+ </div>
 </section>
 
 <section id="v-epargne" hidden class="stack-sp">
@@ -990,8 +1142,8 @@ function drawMap(){mapStats={};const W=mapSvg.clientWidth,H=mapSvg.clientHeight;
  for(let a=1;a<=20;a++){const[x,y]=P(...CENT[a]);const cs=by[a]||[];const n=cs.length;const best=n?Math.max(...cs.filter(c=>!c.grave).map(c=>c.score),-1):-1;
   const col=!n?'var(--card)':best<0?'var(--red)':best>=70?'var(--green)':best>=50?'var(--blue)':'#6b7280';const r=(small?13:17)+Math.min(n,6)*(small?2:3);
   const pref=S.f.arrs.includes(a);const ok=cs.filter(c=>!c.grave),pp=ok.map(c=>c.ppm2).filter(Boolean).sort((u,v)=>u-v);mapStats[a]={n,med:pp.length?pp[Math.floor(pp.length/2)]:null,x,y,r};
-  h+=`<g data-arr="${a}" style="cursor:pointer" aria-label="${arrL(a)} : prix moyen de référence ${eur(+S.avg[a])} le m²"><circle cx="${x}" cy="${y}" r="${r}" style="fill:${col};stroke:${pref?'var(--ink)':'var(--line)'};stroke-width:${pref?3:1.5}"/><text x="${x}" y="${y+(n?-1:5)}" text-anchor="middle" style="fill:${n?'#fff':'var(--ink)'};font:700 ${small?13:16}px 'Barlow Condensed'">${arrL(a)}</text>${n?`<text x="${x}" y="${y+13}" text-anchor="middle" style="fill:#fff;font:600 11px Barlow">${n} ann.</text>`:''}</g>`}
- if(S.work){const[x,y]=P(S.work.lat,S.work.lng);h+=`<g pointer-events="none"><path d="M${x},${y} l-9,-16 a10,10 0 1,1 18,0 z" style="fill:var(--red);stroke:#fff;stroke-width:2"/><circle cx="${x}" cy="${y-21}" r="3.5" fill="#fff"/>${small?'':`<text x="${x+14}" y="${y-18}" style="fill:var(--ink);font:600 13px Barlow">${esc((S.work.label||'Lieu de référence').slice(0,40))}</text>`}</g>`}
+  h+=`<g data-arr="${a}" style="cursor:pointer" aria-label="${arrL(a)} : prix moyen de référence ${eur(+S.avg[a])} le m²"><circle cx="${x}" cy="${y}" r="${r}" style="fill:${col};stroke:${pref?'var(--ink)':'var(--line)'};stroke-width:${pref?3:1.5}"/><text x="${x}" y="${y+(n?-1:5)}" text-anchor="middle" style="fill:${n?'#fff':'var(--ink)'};font:600 ${small?12:14}px system-ui,sans-serif">${arrL(a)}</text>${n?`<text x="${x}" y="${y+13}" text-anchor="middle" style="fill:#fff;font:500 11px system-ui,sans-serif">${n} ann.</text>`:''}</g>`}
+ if(S.work){const[x,y]=P(S.work.lat,S.work.lng);h+=`<g pointer-events="none"><path d="M${x},${y} l-9,-16 a10,10 0 1,1 18,0 z" style="fill:var(--red);stroke:#fff;stroke-width:2"/><circle cx="${x}" cy="${y-21}" r="3.5" fill="#fff"/>${small?'':`<text x="${x+14}" y="${y-18}" style="fill:var(--ink);font:500 13px system-ui,sans-serif">${esc((S.work.label||'Lieu de référence').slice(0,40))}</text>`}</g>`}
  mapSvg.innerHTML=h}
 const mapRO=new ResizeObserver(()=>{if(!$('#v-carte').hidden)drawMap()});mapRO.observe(mapSvg);
 mapSvg.addEventListener('click',e=>{const rect=mapSvg.getBoundingClientRect();
@@ -1316,10 +1468,62 @@ const vp=$('#v-placement');
 vp.addEventListener('input',e=>{const t=e.target;if(t.id==='plAmt'){P.amt=Nm(t.value)||0}else if(t.id==='plMon'){P.mon=Nm(t.value)||0}else return;plCalc();savePl()});
 vp.addEventListener('change',e=>{const t=e.target;if(t.id==='plLep'){P.lep=t.checked;plCalc();savePl()}else if(t.dataset.pc!=null){const i=+t.dataset.pc;P.chk=P.chk.filter(x=>x!==i);if(t.checked)P.chk.push(i);savePl()}});
 
+/* ---------- budget d'achat ---------- */
+const BKEY='appart-paris-budget-v1';
+const defB=()=>({lid:'',price:450000,neuf:false,trav:0,apport:+S.fin.apport||0,taux:3.8,duree:+S.fin.duree||25,assur:+S.fin.assur||0.3,gar:1.2,dossier:800,rev:null,autres:0,primo:true,ppl:false,pplAmt:24200});
+let B=defB();try{const d=JSON.parse(localStorage.getItem(BKEY)||'null');if(d&&typeof d==='object')B={...B,...d}}catch(e){}
+const saveB=()=>{try{localStorage.setItem(BKEY,JSON.stringify(B))}catch(e){}};
+const BF=[['price','Prix du bien (€)'],['trav','Travaux prévus (€)'],['apport','Apport disponible (€)'],['taux','Taux du crédit (%)'],['duree','Durée (ans)'],['assur','Assurance emprunteur (% par an)'],['gar','Garantie du prêt (% de l’emprunt)'],['dossier','Frais de dossier bancaire (€)'],['rev','Revenus nets mensuels du foyer (€)'],['autres','Autres crédits en cours (€/mois)'],['pplAmt','Montant Prêt Paris Logement (€)']];
+function notaire(p,neuf,primo){const base=neuf?p/1.2:p;const dmR=neuf?.715:((primo?4.5:5)*1.0237+1.2);const dm=base*dmR/100;let e=0,lo=0;
+ for(const[hi,r]of[[6500,3.87],[17000,1.596],[60000,1.064],[Infinity,.799]]){if(base>lo)e+=(Math.min(base,hi)-lo)*r/100;lo=hi}
+ e*=1.2;const csi=base>0?Math.max(15,base*.001):0,deb=p>0?1200:0;return{dmR,dm,e,csi,deb,tot:dm+e+csi+deb}}
+function bPlan(price){const v=k=>Math.max(0,+B[k]||0);const n=notaire(price,!!B.neuf,!!B.primo);const base=price+v('trav')+n.tot+v('dossier');
+ const ppl=B.ppl?Math.min(v('pplAmt'),Math.max(0,base-v('apport'))):0;const g=Math.min(v('gar'),20)/100;
+ const loan=Math.max(0,(base-v('apport')-ppl)/(1-g));const gar=loan*g;const dur=clamp(v('duree')||25,1,30),Nn=dur*12,r=v('taux')/1200;
+ const pm=loan?(r?loan*r/(1-(1+r)**-Nn):loan/Nn):0;const ins=loan*v('assur')/1200;const pplM=ppl/180;const month=pm+ins+pplM;
+ const rev=v('rev');const fees=n.tot+v('dossier')+gar;
+ return{price,n,ppl,loan,gar,total:base+gar,pm,ins,pplM,month,interest:pm*Nn-loan,insTot:ins*Nn,endet:rev?(month+v('autres'))/rev:null,fees,rec:fees+.1*price,dur}}
+function bMax(){if(!(+B.rev>0))return null;let lo=0,hi=5e6;for(let i=0;i<45;i++){const m=(lo+hi)/2;if(bPlan(m).endet<=.35)lo=m;else hi=m}return lo}
+function renderBudget(){const own=L.filter(l=>!l.sample&&nz(l.price));if(B.lid&&!own.some(l=>l.id===B.lid))B.lid='';
+ $('#bgIn').innerHTML=`<label class="fld"><span>Partir d’une annonce</span><select id="bg-lid"><option value="">Saisie libre</option>${own.map(l=>`<option value="${esc(l.id)}"${l.id===B.lid?' selected':''}>${esc((l.title||'Annonce').slice(0,40))} · ${eur(l.price)}</option>`).join('')}</select></label>
+ <label class="fld"><span>Type de bien</span><select id="bg-neuf"><option value="0"${!B.neuf?' selected':''}>Ancien</option><option value="1"${B.neuf?' selected':''}>Neuf / VEFA</option></select></label>`+
+  BF.map(([k,lab])=>`<label class="fld"><span>${lab}</span><input inputmode="decimal" data-b="${k}" value="${esc(nz(B[k])?String(B[k]).replace('.',','):'')}"${k==='rev'?' placeholder="ex. 2 800"':''}></label>`).join('');
+ $('#bgPrimo').checked=!!B.primo;$('#bgPPL').checked=!!B.ppl;bCalc()}
+function bCalc(){const price=+B.price||0;
+ if(!price){$('#bgRes').innerHTML='<p class="mut">Indiquez un prix ou choisissez une annonce.</p>';$('#bgT').innerHTML='';$('#bgMax').innerHTML='';return}
+ const p=bPlan(price),n=p.n,ap=+B.apport||0,aut=+B.autres||0;
+ let h=`<div class="kpis" style="margin:8px 0 0"><div class="kpi"><b>${eur(p.total)}</b><span>Coût total de l’achat</span></div><div class="kpi"><b>${eur(p.month)}</b><span>par mois sur ${p.dur} ans</span></div><div class="kpi"><b>${eur(p.loan)}</b><span>à emprunter à la banque</span></div></div>
+ <p class="mut small" style="margin:0">Mensualité = crédit ${eur(p.pm)} + assurance ${eur(p.ins)}${p.ppl?` + Prêt Paris Logement ${eur(p.pplM)}`:''}</p>`;
+ if(p.endet!=null){const bad=p.endet>.35;h+=`<p style="margin:14px 0 0"><b>Taux d’endettement : <span class="${bad?'bad':'good'}">${NF.format(p.endet*100)} %</span></b> <span class="mut small">(maximum 35 %, assurance comprise)</span></p>
+  <div class="prog"><u style="width:${(clamp(p.endet/.5,0,1)*100).toFixed(1)}%;background:${bad?'var(--red2)':'var(--green)'}"></u></div>
+  <p class="small" style="margin:0">${bad?`Il faudrait environ ${eur((p.month+aut)/.35)} de revenus nets par mois, plus d’apport ou un prix plus bas.`:`Marge restante : ${eur(.35*B.rev-p.month-aut)} par mois.`}</p>`}
+ else h+=`<p class="mut small" style="margin-top:12px">Ajoutez vos revenus nets mensuels pour voir le taux d’endettement et le prix maximum.</p>`;
+ if(ap<p.fees)h+=`<p class="warn">Votre apport (${eur(ap)}) ne couvre pas les frais (${eur(p.fees)}). Les banques financent rarement les frais de notaire.</p>`;
+ else if(ap<p.rec)h+=`<p class="tip">Votre apport couvre les frais. Pour un dossier solide, visez ${eur(p.rec)} (frais + 10 % du prix) : il manque ${eur(p.rec-ap)}.</p>`;
+ else h+=`<p class="tip"><span class="good">Votre apport couvre les frais et plus de 10 % du prix.</span></p>`;
+ h+=`<button id="bgToFin" style="margin-top:12px">Utiliser apport, taux, durée et assurance dans le classement</button>`;
+ $('#bgRes').innerHTML=h;
+ const rows=[['Prix du bien',p.price],['Droits de mutation (taxes, '+NF.format(n.dmR)+' %)',n.dm],['Émoluments du notaire (TTC)',n.e],['Contribution de sécurité immobilière',n.csi],['Débours et formalités (estimation)',n.deb],['<b>Frais de notaire</b> ('+NF.format(n.tot/p.price*100)+' % du prix)',n.tot,1],['Travaux',+B.trav||0],['Garantie du prêt (caution)',p.gar],['Frais de dossier bancaire',+B.dossier||0],['<b>Coût total de l’achat</b>',p.total,1],['Apport',-ap],p.ppl?['Prêt Paris Logement (0 %, 15 ans)',-p.ppl]:null,['<b>Emprunt bancaire</b>',p.loan,1],['Intérêts sur '+p.dur+' ans',p.interest],['Assurance sur '+p.dur+' ans',p.insTot],['<b>Coût total du crédit</b>',p.interest+p.insTot,1]];
+ $('#bgT').innerHTML='<tbody>'+rows.filter(Boolean).map(([l,v,b])=>`<tr><td>${l}</td><td class="n">${b?'<b>'+eur(v)+'</b>':eur(v)}</td></tr>`).join('')+'</tbody>';
+ const mx=bMax();let mh;
+ if(mx==null)mh='<p class="mut small">Ajoutez vos revenus nets mensuels pour calculer le prix maximum.</p>';
+ else if(mx<20000)mh='<p class="bad">Avec ces revenus et ces crédits en cours, une banque ne pourrait pas prêter aux règles actuelles (35 % maximum).</p>';
+ else{const av=Object.values(S.avg).map(Number).filter(x=>x>0);const lo=Math.min(...av),mean=av.reduce((a,b)=>a+b,0)/av.length;
+  mh=`<p style="margin:0"><span class="big">${eur(mx)}</span></p><p class="small" style="margin:6px 0 0">Avec ${eur(B.rev)} nets par mois, ${eur(ap)} d’apport et ${NF.format(+B.taux||0)} % sur ${p.dur} ans, en restant à 35 % d’endettement. Soit environ <b>${num(mx/lo)} m²</b> au prix de l’arrondissement le moins cher de vos réglages, ou ${num(mx/mean)} m² au prix moyen parisien.</p>`}
+ $('#bgMax').innerHTML=mh}
+const vb=$('#v-budget');
+vb.addEventListener('input',e=>{const t=e.target;if(!t.dataset.b)return;B[t.dataset.b]=Nm(t.value);if(t.dataset.b==='price'){B.lid='';$('#bg-lid').value=''}bCalc();saveB()});
+vb.addEventListener('change',e=>{const t=e.target;
+ if(t.id==='bg-lid'){B.lid=t.value;const l=L.find(x=>x.id===t.value);if(l){B.price=l.price;B.neuf=!!l.isNew;B.trav=Math.round(calc(l).renov||0)}saveB();renderBudget()}
+ else if(t.id==='bg-neuf'){B.neuf=t.value==='1';saveB();bCalc()}
+ else if(t.id==='bgPrimo'){B.primo=t.checked;saveB();bCalc()}
+ else if(t.id==='bgPPL'){B.ppl=t.checked;saveB();bCalc()}});
+vb.addEventListener('click',e=>{if(e.target.id!=='bgToFin')return;S.fin={...S.fin,apport:+B.apport||0,taux:+B.taux||0,duree:+B.duree||25,assur:+B.assur||0};saveS();fillSettings();renderAll();toast('Hypothèses reportées dans Réglages : mensualités du classement mises à jour')});
+
 /* ---------- navigation ---------- */
-const VIEWS=['liste','carte','comparer','epargne','placer','placement','reglages'];
+const VIEWS=['liste','carte','comparer','budget','epargne','placer','placement','reglages'];
 function route(){const v=VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):'liste';VIEWS.forEach(x=>{$('#v-'+x).hidden=x!==v});$$('nav a').forEach(a=>{if(a.getAttribute('href')==='#'+v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
- if(v==='carte'){renderArrT();requestAnimationFrame(drawMap)}if(v==='comparer')renderCmp();if(v==='epargne')renderEp();if(v==='placement')renderPl();if(v==='liste')renderList()}
+ if(v==='carte'){renderArrT();requestAnimationFrame(drawMap)}if(v==='comparer')renderCmp();if(v==='budget')renderBudget();if(v==='epargne')renderEp();if(v==='placement')renderPl();if(v==='liste')renderList()}
 function renderAll(){cityCache.size>300&&cityCache.clear();renderList();const v=location.hash.slice(1);if(v==='carte'){renderArrT();drawMap()}if(v==='comparer')renderCmp();if(curId&&!$('#ov').hidden)liveD();wPct()}
 window.addEventListener('hashchange',route);
 fillSettings();route();
