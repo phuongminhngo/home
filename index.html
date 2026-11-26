@@ -286,6 +286,8 @@ table{font-size:14px}
 .lang button[aria-pressed=true]{background:var(--hover);color:var(--ink);font-weight:600}
 #trSt{font-size:11px;color:var(--mut);margin-left:4px}
 @media(max-width:860px){.lang{padding:0 0 0 6px}}
+.why{font-size:13.5px;color:var(--ink);margin-top:4px}
+#comT input,#comT select{min-height:30px;font-size:13.5px}
 .cx-log{display:grid;gap:16px;margin:8px 0 12px}
 .cx-u{justify-self:end;background:var(--side);border-radius:8px;padding:8px 12px;max-width:80%;white-space:pre-wrap}
 .cx-a{line-height:1.65;font-size:15px}
@@ -601,6 +603,12 @@ table{font-size:14px}
   <p class="small" id="wRes"></p>
  </div>
  <div class="card">
+  <h3>Communes suivies</h3>
+  <p class="mut small">Les annonces de ces communes ne sont pas signalées « hors Paris » et leur prix/m² est comparé au prix moyen de la commune. Ajoutez une ligne « Paris » pour donner une note de sécurité aux annonces parisiennes. Indiquez la source et l’année de chaque chiffre.</p>
+  <div class="scroll"><table id="comT"></table></div>
+  <div class="row" style="margin-top:8px"><button id="comAdd">+ Ajouter une commune</button></div>
+ </div>
+ <div class="card">
   <h3>Financement et frais</h3>
   <div class="fgrid" id="finBox"></div>
  </div>
@@ -638,19 +646,19 @@ const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(
 
 const AVG0={1:12481,2:11222,3:11914,4:12547,5:11738,6:14414,7:13818,8:11905,9:10745,10:9182,11:9797,12:8875,13:8505,14:9286,15:9433,16:10627,17:10012,18:8727,19:7861,20:8269};
 const CENT={1:[48.8625,2.3364],2:[48.8683,2.3428],3:[48.863,2.3601],4:[48.8543,2.3576],5:[48.8445,2.3497],6:[48.8491,2.3328],7:[48.8562,2.3122],8:[48.8727,2.3125],9:[48.877,2.3375],10:[48.8761,2.3607],11:[48.859,2.38],12:[48.84,2.389],13:[48.8283,2.3622],14:[48.8292,2.3266],15:[48.8401,2.2934],16:[48.863,2.276],17:[48.8873,2.3067],18:[48.8925,2.3484],19:[48.8871,2.3848],20:[48.8634,2.4011]};
-const W0={prix:40,dpe:15,etage:10,lumiere:8,exterieur:8,parking:4,charges:8,distance:7};
-const WL={prix:'Prix/m² réel vs moyenne de l’arrondissement',dpe:'DPE',etage:'Étage et ascenseur',lumiere:'Lumière et exposition',exterieur:'Extérieur (balcon, terrasse)',parking:'Parking',charges:'Charges de copro',distance:'Distance au lieu de référence'};
+const W0={prix:40,transport:10,securite:8,dpe:15,etage:10,lumiere:8,exterieur:8,parking:4,charges:8,distance:7};
+const WL={transport:'Transport (direct, rapide, gare à pied)',securite:'Sécurité (données officielles de la commune)',prix:'Prix/m² réel vs moyenne de l’arrondissement ou de la commune',dpe:'DPE',etage:'Étage et ascenseur',lumiere:'Lumière et exposition',exterieur:'Extérieur (balcon, terrasse)',parking:'Parking',charges:'Charges de copro',distance:'Distance au lieu de référence'};
 const ST={a_visiter:'À visiter',visitee:'Visitée',offre:'Offre faite',rejetee:'Rejetée'};
 const CHK={humidite:'Humidité',bruit:'Bruit',lumiere:'Lumière',immeuble:'État de l’immeuble',pv:'PV d’AG de copro'};
-const FIELDS=[['title','Titre','text'],['url','Lien de l’annonce','text'],['price','Prix (€)','num'],['surface','Surface annoncée (m²)','num'],['carrez','Surface Carrez / habitable (m²)','num'],['included','Extérieur compté dans la surface (m²)','num'],['rooms','Pièces','num'],['bedrooms','Chambres','num'],['floor','Étage (0 = RDC)','num'],['floorsTotal','Nombre d’étages','num'],['lift','Ascenseur','tri'],['arr','Arrondissement','arr'],['quartier','Quartier','text'],['dpe','DPE','letter'],['ges','GES','letter'],['year','Année de construction','num'],['charges','Charges copro (€/mois)','num'],['outdoor','Extérieur (m²)','num'],['outdoorType','Type d’extérieur','text'],['parking','Parking','tri'],['expo','Exposition','text'],['traversant','Traversant','tri'],['isNew','Neuf / VEFA','tri'],['agency','Agence','text'],['renov','Travaux estimés (€)','num'],['lat','Latitude (optionnel)','num'],['lng','Longitude (optionnel)','num']];
+const FIELDS=[['title','Titre','text'],['url','Lien de l’annonce','text'],['price','Prix (€)','num'],['surface','Surface annoncée (m²)','num'],['carrez','Surface Carrez / habitable (m²)','num'],['included','Extérieur compté dans la surface (m²)','num'],['rooms','Pièces','num'],['bedrooms','Chambres','num'],['floor','Étage (0 = RDC)','num'],['floorsTotal','Nombre d’étages','num'],['lift','Ascenseur','tri'],['arr','Arrondissement','arr'],['commune','Commune (hors Paris)','text'],['cp','Code postal','text'],['quartier','Quartier','text'],['dpe','DPE','letter'],['ges','GES','letter'],['year','Année de construction','num'],['charges','Charges copro (€/mois)','num'],['outdoor','Extérieur (m²)','num'],['outdoorType','Type d’extérieur','text'],['parking','Parking','tri'],['expo','Exposition','text'],['traversant','Traversant','tri'],['isNew','Neuf / VEFA','tri'],['gare','Gare la plus proche','text'],['marche','Gare à pied (min)','num'],['trajet','Trajet vers Paris (min)','num'],['direct','Trajet direct sans changement','tri'],['agency','Agence','text'],['source','Source (site)','text'],['found','Trouvée le (AAAA-MM-JJ)','text'],['avis','Avis quartier, copro, agence (1 ligne + source)','text'],['renov','Travaux estimés (€)','num'],['lat','Latitude (optionnel)','num'],['lng','Longitude (optionnel)','num']];
 const KEYF=['price','surface','carrez','included','rooms','bedrooms','floor','floorsTotal','lift','arr','quartier','dpe','ges','year','charges','outdoor','outdoorType','parking','expo','agency','isNew'];
-const NUMK=new Set(['price','surface','carrez','included','rooms','bedrooms','floor','floorsTotal','arr','year','charges','outdoor','renov','rating','lat','lng']);
-const BOOLK=new Set(['lift','parking','traversant','isNew']);
+const NUMK=new Set(['marche','trajet','price','surface','carrez','included','rooms','bedrooms','floor','floorsTotal','arr','year','charges','outdoor','renov','rating','lat','lng']);
+const BOOLK=new Set(['lift','parking','traversant','isNew','direct']);
 
-const defS=()=>({avg:{...AVG0},w:{...W0},work:null,fin:{apport:80000,taux:3.3,duree:25,assur:0.3},not:{ancien:8,neuf:2.5},renov:{F:500,G:700},f:{max:'',minS:'',minP:'',arrs:[],st:'',hide:false,q:''},sort:'score',cmp:[],updated:0});
+const defS=()=>({communes:[],avg:{...AVG0},w:{...W0},work:null,fin:{apport:80000,taux:3.3,duree:25,assur:0.3},not:{ancien:8,neuf:2.5},renov:{F:500,G:700},f:{max:'',minS:'',minP:'',arrs:[],st:'',hide:false,q:''},sort:'score',cmp:[],updated:0});
 let S=defS(),L=[];
 const KEY='appart-paris-v1';
-function mergeS(x){const d=defS();if(!x||typeof x!=='object')return d;return{...d,...x,avg:{...d.avg,...(x.avg||{})},w:{...d.w,...(x.w||{})},fin:{...d.fin,...(x.fin||{})},not:{...d.not,...(x.not||{})},renov:{...d.renov,...(x.renov||{})},f:{...d.f,...(x.f||{}),arrs:Array.isArray(x.f?.arrs)?x.f.arrs:[]},cmp:Array.isArray(x.cmp)?x.cmp:[]}}
+function mergeS(x){const d=defS();if(!x||typeof x!=='object')return d;return{...d,...x,avg:{...d.avg,...(x.avg||{})},w:{...d.w,...(x.w||{})},fin:{...d.fin,...(x.fin||{})},not:{...d.not,...(x.not||{})},renov:{...d.renov,...(x.renov||{})},f:{...d.f,...(x.f||{}),arrs:Array.isArray(x.f?.arrs)?x.f.arrs:[]},cmp:Array.isArray(x.cmp)?x.cmp:[],communes:Array.isArray(x.communes)?x.communes.filter(c=>c&&c.id):[]}}
 try{const d=JSON.parse(localStorage.getItem(KEY)||'null');if(d){L=Array.isArray(d.L)?d.L.filter(o=>o&&o.id):[];S=mergeS(d.S)}}catch(e){}
 function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify({L,S}))}catch(e){}}
 
@@ -737,6 +745,7 @@ function extract(raw){
  for(const c of CITIES){const r=new RegExp('(^|[^a-z])('+norm(c).replace(/[- ]/g,'[- ]')+')(?![a-z])','g');let q;while(q=r.exec(nx)){const pre=nx.slice(Math.max(0,q.index-28),q.index+q[1].length);
    if(/(bois|porte|avenue|av\.|rue|boulevard|bd|quai|route|gare|ligne|direction|puces|marche|square|place|villa|passage|impasse|cite|chaussee|faubourg|metro)\s+(de\s+|d'|du\s+|des\s+)?(la\s+|l')?$/.test(pre))continue;
    const strong=/(\ba\s+|sur la commune de\s+|situe\s+a\s+|ville de\s+|commune de\s+)$/.test(pre);cities.push({c,strong});break}}
+ if(o.arr==null){if(pcs[0])set('cp',pcs[0]);const st=cities.find(k=>k.strong)||cities[0];if(st)set('commune',st.c)}else set('cp',String(75000+o.arr));
  o._cities=cities;o._pcs=pcs;
  o.desc=t.trim();
  return{o,got};
@@ -749,6 +758,24 @@ function hav(a,b){const R=6371,r=Math.PI/180,dl=(b.lat-a.lat)*r,dg=(b.lng-a.lng)
 function cityInfo(l){const d=l.desc||'';if(!d)return{cities:[],pcs:[]};const e=extract(d).o;return{cities:e._cities||[],pcs:e._pcs||[]}}
 const cityCache=new Map();
 function getCities(l){const k=l.desc||'';if(!cityCache.has(k))cityCache.set(k,cityInfo(l));return cityCache.get(k)}
+function comRow(l){const cs=(S.communes||[]).filter(c=>norm(c.name)&&norm(c.name)!=='paris');if(!cs.length)return null;
+ const n=norm(l.commune),cp=String(l.cp||'').trim();const cps=c=>String(c.cp||'').split(/[,;\s]+/).filter(Boolean);
+ let r=cs.find(c=>(cp&&cps(c).includes(cp))||(n&&norm(c.name)===n));
+ if(!r&&!l.commune&&!l.cp){const ci=getCities(l);r=cs.find(c=>ci.cities.some(k=>norm(k.c)===norm(c.name))||ci.pcs.some(p=>cps(c).includes(p)))}
+ return r||null}
+const parisRow=()=>(S.communes||[]).find(c=>norm(c.name)==='paris')||null;
+function trS(l,c){const r=c.com;const mins=nz(l.trajet)?+l.trajet:(r&&nz(r.minutes)?+r.minutes:null);const dir=l.direct!=null?l.direct:(r?r.direct!==false:null);const walk=nz(l.marche)?+l.marche:null;
+ if(mins==null&&dir==null&&walk==null)return l.arr!=null?.8:null;
+ const tm=mins==null?.6:clamp((45-mins)/30,0,1),dr=dir==null?.7:dir?1:.3,wk=walk==null?.7:clamp((25-walk)/15,0,1);return .45*tm+.35*dr+.2*wk}
+function secS(l,c){const r=l.arr!=null?parisRow():c.com;if(!r||!r.secu)return null;return{bonne:1,moyenne:.6,faible:.2}[r.secu]??null}
+function why(l,c){if(c.grave)return'Rétrogradé : '+c.flags.filter(f=>f.lvl==='grave').map(f=>f.txt).join(', ');
+ const r=l.arr!=null?parisRow():c.com;const mins=nz(l.trajet)?l.trajet:(c.com&&nz(c.com.minutes)?c.com.minutes:null);const dir=l.direct??(c.com?c.com.direct!==false:null);
+ const T={prix:()=>c.ratio!=null?`prix/m² ${pct(c.ratio-1)} vs ${c.avgLab}`:null,transport:()=>mins!=null?`${mins} min${dir?' direct':dir===false?' avec changement':''}`:(l.arr!=null?'métro (Paris)':null),securite:()=>r&&r.secu?'sécurité '+r.secu:null,dpe:()=>l.dpe?'DPE '+l.dpe:null,
+  etage:()=>nz(l.floor)?(l.floor===0?'rez-de-chaussée':arrL(l.floor)+' étage')+(l.lift?' avec ascenseur':l.lift===false?' sans ascenseur':''):null,lumiere:()=>c.sub.lumiere>=.7?'lumineux':'peu lumineux',exterieur:()=>l.outdoorType||'pas d’extérieur',parking:()=>l.parking?'parking':'pas de parking',charges:()=>nz(l.charges)?`charges ${eur(l.charges)}/mois`:null,distance:()=>c.km!=null?num(c.km)+' km du lieu de référence':null};
+ const ks=Object.keys(W0).filter(k=>c.sub[k]!=null&&(k!=='distance'||S.work)&&(+S.w[k]||0)>0);const w=k=>+S.w[k]||0;
+ const good=ks.filter(k=>c.sub[k]>=.7).sort((a,b)=>w(b)*c.sub[b]-w(a)*c.sub[a]).slice(0,2).map(k=>T[k]()).filter(Boolean);
+ const bad=ks.filter(k=>c.sub[k]<=.35).sort((a,b)=>w(b)*(1-c.sub[b])-w(a)*(1-c.sub[a])).slice(0,1).map(k=>T[k]()).filter(Boolean);
+ return[good.length?'atouts : '+good.join(', '):'',bad.length?'point faible : '+bad.join(', '):''].filter(Boolean).join(' · ')||'données insuffisantes pour expliquer le score'}
 function flags(l,c){
  const F=[];const add=(lvl,txt)=>{if(!F.some(f=>f.txt===txt))F.push({lvl,txt})};
  const d=(l.desc||'').toLowerCase()+' '+(l.title||'').toLowerCase();const ag=(l.agency||'').toLowerCase();
@@ -762,10 +789,11 @@ function flags(l,c){
  if(/ench[èe]res|mise à prix/.test(d))add('grave','Vente aux enchères');
  if(/\bbureaux\b|local (?:commercial|professionnel|d['’]activit)|usage (?:de |d['’])?bureau|murs commerciaux|fonds de commerce/.test(d)||/^(bureau|bureaux|local)/.test(l.type||''))add('grave','Bureau ou local, pas un logement');
  const ci=getCities(l);
- const ext=ci.pcs.find(p=>!/^75/.test(p));
- if(ext)add('grave','Code postal hors Paris ('+ext+')');
- for(const k of ci.cities){if(k.strong||l.arr==null)add('grave','Situé à '+k.c+', pas à Paris');else add('alerte','Mentionne '+k.c+' : vérifier l’adresse')}
- if(l.arr==null)add('alerte','Arrondissement inconnu');
+ if(!c.com){const ext=ci.pcs.find(p=>!/^75/.test(p))||(l.cp&&!/^75/.test(String(l.cp))?String(l.cp):null);
+  if(ext)add('grave','Hors Paris et hors communes suivies ('+ext+')');
+  for(const k of ci.cities){if(k.strong||l.arr==null)add('grave','Situé à '+k.c+', hors communes suivies');else add('alerte','Mentionne '+k.c+' : vérifier l’adresse')}
+  if(l.arr==null&&l.commune&&norm(l.commune)!=='paris'&&!ext)add('grave','Commune '+l.commune+' non suivie');
+  if(l.arr==null&&!l.commune)add('alerte','Arrondissement ou commune inconnu')}
  if(!nz(l.price)||!c.real)add('alerte','Prix ou surface manquant');
  if(c.ppm2!=null&&(c.ppm2<3000||c.ppm2>30000))add('grave','Prix/m² incohérent ('+eur(c.ppm2)+'/m²)');
  if(nz(l.surface)&&l.surface>300&&nz(l.rooms)&&l.rooms<=3)add('grave','Surface suspecte : '+num(l.surface)+' m² pour '+l.rooms+' pièce'+(l.rooms>1?'s':''));
@@ -785,9 +813,9 @@ function lightS(l){const ck=l.check?.lumiere?.v;if(ck)return{ok:1,bof:.5,ko:0}[c
  if(/sombre|(^|[^s][^a][^n][^s] )vis-a-vis|sur cour/.test(d.replace(/sans vis-a-vis/g,''))){s-=.15;known=true}if(l.floor===0){s-=.2;known=true}else if(l.floor>=4){s+=.1;known=true}return known?clamp(s,0,1):null}
 function outS(l){if(nz(l.outdoor)&&l.outdoor>0)return clamp(.35+l.outdoor/15,0,1);if(l.outdoorType)return .5;return 0}
 function calc(l){
- const c={};c.real=realSurf(l);c.ppm2=nz(l.price)&&c.real?l.price/c.real:null;c.avg=+S.avg[l.arr]||9700;c.ratio=c.ppm2?c.ppm2/c.avg:null;
+ const c={};c.com=l.arr==null?comRow(l):null;c.real=realSurf(l);c.ppm2=nz(l.price)&&c.real?l.price/c.real:null;c.avg=c.com&&+c.com.prix?+c.com.prix:(+S.avg[l.arr]||9700);c.avgLab=c.com?c.com.name:arrL(l.arr);c.ratio=c.ppm2?c.ppm2/c.avg:null;
  const w=S.work,co=coords(l);c.km=w&&co?hav(co,w):null;
- const sub={prix:c.ratio==null?0:clamp((1.3-c.ratio)/.6,0,1),dpe:l.dpe?{A:1,B:.9,C:.75,D:.55,E:.35,F:.1,G:0}[l.dpe]:null,etage:floorS(l),lumiere:lightS(l),exterieur:outS(l),parking:l.parking==null?null:(l.parking?1:0),charges:nz(l.charges)&&c.real?clamp((5-l.charges/c.real)/4,0,1):null,distance:c.km==null?null:clamp(1-(c.km-1)/7,0,1)};
+ const sub={prix:c.ratio==null?0:clamp((1.3-c.ratio)/.6,0,1),dpe:l.dpe?{A:1,B:.9,C:.75,D:.55,E:.35,F:.1,G:0}[l.dpe]:null,etage:floorS(l),lumiere:lightS(l),exterieur:outS(l),parking:l.parking==null?null:(l.parking?1:0),charges:nz(l.charges)&&c.real?clamp((5-l.charges/c.real)/4,0,1):null,distance:c.km==null?null:clamp(1-(c.km-1)/7,0,1)};sub.transport=trS(l,c);sub.securite=secS(l,c);
  let sw=0,ss=0;for(const k in W0){if(k==='distance'&&!w)continue;const wt=Math.max(0,+S.w[k]||0);const v=sub[k]==null?.4:sub[k];sw+=wt;ss+=wt*v}
  c.sub=sub;c.base=sw?100*ss/sw:0;c.flags=flags(l,c);c.grave=c.flags.filter(f=>f.lvl==='grave').length;c.pen=Math.min(c.grave*30,90);c.score=Math.max(0,Math.round(c.base-c.pen));
  c.notary=nz(l.price)?l.price*(l.isNew?+S.not.neuf:+S.not.ancien)/100:null;
@@ -931,14 +959,14 @@ function filtered(){
 function card({l,c},i){
  const fl=c.flags.filter(f=>f.lvl!=='info'||true);
  const flo=nz(l.floor)?(l.floor===0?'RDC':arrL(l.floor)+(nz(l.floorsTotal)?'/'+l.floorsTotal:''))+(l.lift===true?' asc.':l.lift===false?' sans asc.':''):null;
- const meta=[nz(l.rooms)?l.rooms+' p.':null,nz(l.bedrooms)?l.bedrooms+' ch.':null,flo,l.outdoorType?(l.outdoorType+(nz(l.outdoor)?' '+num(l.outdoor)+' m²':'')):null,l.parking?'parking':null,nz(l.charges)?'charges '+eur(l.charges)+'/mois':null,c.km!=null?num(c.km)+' km':null,l.quartier].filter(Boolean).map(esc).join(' · ');
+ const meta=[nz(l.rooms)?l.rooms+' p.':null,nz(l.bedrooms)?l.bedrooms+' ch.':null,flo,l.outdoorType?(l.outdoorType+(nz(l.outdoor)?' '+num(l.outdoor)+' m²':'')):null,l.parking?'parking':null,nz(l.charges)?'charges '+eur(l.charges)+'/mois':null,c.km!=null?num(c.km)+' km':null,nz(l.trajet)?l.trajet+' min'+(l.direct?' direct':''):null,l.quartier].filter(Boolean).map(esc).join(' · ');
  const inCmp=S.cmp.includes(l.id);
  return`<li class="card item${c.grave?' sus':''}">
  <div class="plate ${scls(c)}"><span class="rk">n°${i+1}</span><b>${c.score}</b><small>/100</small></div>
  <div>
-  <div><span class="arrb">${arrL(l.arr)}</span><button class="ttl" data-open="${esc(l.id)}">${esc(l.title||'Annonce sans titre')}</button>${l.sample?'<span class="exb">Exemple</span>':''}</div>
+  <div><span class="arrb">${l.arr!=null?arrL(l.arr):esc(l.commune||c.com&&c.com.name||"?")}</span><button class="ttl" data-open="${esc(l.id)}">${esc(l.title||'Annonce sans titre')}</button>${l.sample?'<span class="exb">Exemple</span>':''}</div>
   <div class="nums"><span class="p">${eur(l.price)}</span><span>${c.real?num(c.real)+' m²':'surface ?'}${nz(l.surface)&&c.real&&Math.abs(c.real-l.surface)>.5?` <s class="mut">${num(l.surface)}</s>`:''}</span><span><b>${c.ppm2?eur(c.ppm2)+'/m²':'–'}</b>${c.ratio?` <span class="${c.ratio<1?'good':'bad'}">${pct(c.ratio-1)}</span>`:''}</span>${l.dpe?`<span class="dpe d-${l.dpe}" title="DPE">${l.dpe}</span>`:''}<span class="mut">total ${eur(c.total)}</span></div>
-  ${meta?`<div class="meta">${meta}</div>`:''}
+  ${meta?`<div class="meta">${meta}</div>`:''}<div class="why">Pourquoi ce rang : ${esc(why(l,c))}</div>${l.avis?`<div class="meta">${esc(l.avis)}</div>`:''}${l.source||l.found?`<div class="meta">${esc([l.source,l.found?'trouvée le '+l.found:null].filter(Boolean).join(' · '))}</div>`:''}
   ${fl.length?`<div class="flags">${fl.map(f=>`<span class="fl ${f.lvl}">${esc(f.txt)}</span>`).join('')}</div>`:''}
   <div class="acts">${l.sample?'':`<select data-st="${esc(l.id)}" aria-label="Statut">${Object.entries(ST).map(([k,v])=>`<option value="${k}"${l.status===k?' selected':''}>${v}</option>`).join('')}</select>`}
    <label class="tog"><input type="checkbox" data-cmp="${esc(l.id)}"${inCmp?' checked':''}> Comparer</label>
@@ -995,7 +1023,7 @@ function liveD(){const l=byId(curId);if(!l)return;const c=calc(l);
  $('#dFlags').innerHTML=c.flags.length?c.flags.map(f=>`<span class="fl ${f.lvl}">${esc(f.txt)}</span>`).join(''):'<span class="fl info">Aucune alerte</span>';
  const wsum=Object.keys(W0).filter(k=>k!=='distance'||S.work).reduce((a,k)=>a+(+S.w[k]||0),0)||1;
  $('#dBars').innerHTML=Object.keys(W0).map(k=>{if(k==='distance'&&!S.work)return`<div class="bar"><span>${WL[k]}</span><span class="mut small">Définissez un lieu dans Réglages</span><em></em></div>`;const v=c.sub[k];const w=(+S.w[k]||0)/wsum;return`<div class="bar"><span title="poids ${Math.round(w*100)} %">${WL[k]}</span><i><u style="width:${Math.round((v??.4)*100)}%;${v==null?'opacity:.35':''}"></u></i><em>${v==null?'?':Math.round(v*100)}</em></div>`}).join('')+
-  `<p class="small mut" style="margin:6px 0 0">Score avant alertes ${Math.round(c.base)}${c.pen?` · pénalité alertes graves −${c.pen}`:''}${c.ppm2?` · ${eur(c.ppm2)}/m² réel contre ${eur(c.avg)}/m² en moyenne (${arrL(l.arr)})`:''}${c.km!=null?` · ${num(c.km)} km à vol d’oiseau de ${esc(S.work.label||'votre lieu')}`:''}</p>`;
+  `<p class="small mut" style="margin:6px 0 0">Score avant alertes ${Math.round(c.base)}${c.pen?` · pénalité alertes graves −${c.pen}`:''}${c.ppm2?` · ${eur(c.ppm2)}/m² réel contre ${eur(c.avg)}/m² en moyenne (${esc(c.avgLab)})`:''}${c.km!=null?` · ${num(c.km)} km à vol d’oiseau de ${esc(S.work.label||'votre lieu')}`:''}${l.arr!=null&&!nz(l.trajet)&&!nz(l.marche)&&l.direct==null?' · transport estimé à 80/100 pour Paris intra-muros (métro)':''}</p>`;
  const f=S.fin;
  $('#dBud').innerHTML=`<table><tr><td>Prix</td><td class="n">${eur(l.price)}</td></tr><tr><td>Frais de notaire (${l.isNew?S.not.neuf:S.not.ancien} %${l.isNew?', neuf':''})</td><td class="n">${eur(c.notary)}</td></tr><tr><td>Travaux ${nz(l.renov)?'(saisis)':l.dpe==='F'||l.dpe==='G'?`(DPE ${l.dpe}, ${eur(S.renov[l.dpe])}/m²)`:''}</td><td class="n">${eur(c.renov)}</td></tr><tr><td><b>Coût total</b></td><td class="n"><b>${eur(c.total)}</b></td></tr><tr><td>Emprunt (apport ${eur(f.apport)})</td><td class="n">${eur(c.loan)}</td></tr></table>
  <p style="margin:10px 0 0"><span class="big">${eur(c.monthly)}</span> <span class="mut">/mois sur ${f.duree} ans à ${num(+f.taux)} %, assurance comprise</span></p>`}
@@ -1058,7 +1086,7 @@ function renderCmp(){const items=S.cmp.map(byId).filter(Boolean).map(l=>({l,c:ca
  const rows=[['Score',x=>x.c.score,'max',v=>v+'/100'],['Prix',x=>x.l.price,'min',eur],['Surface réelle',x=>x.c.real,'max',v=>num(v)+' m²'],['Prix/m² réel',x=>x.c.ppm2,'min',v=>eur(v)+'/m²'],['Écart vs moyenne arr.',x=>x.c.ratio==null?null:x.c.ratio-1,'min',pct],['Arrondissement',x=>x.l.arr,null,v=>arrL(v)],['Pièces / chambres',x=>x.l.rooms,'max',(v,x)=>num(v)+' p. / '+num(x.l.bedrooms)+' ch.'],
   ['Étage',x=>x.c.sub.etage,'max',(v,x)=>nz(x.l.floor)?(x.l.floor===0?'RDC':arrL(x.l.floor))+(x.l.lift===true?', ascenseur':x.l.lift===false?', sans ascenseur':''):'–'],['DPE / GES',x=>DR[x.l.dpe]??null,'min',(v,x)=>`${x.l.dpe?`<span class="dpe d-${x.l.dpe}">${x.l.dpe}</span>`:'?'} / ${x.l.ges?`<span class="dpe d-${x.l.ges}">${x.l.ges}</span>`:'?'}`],
   ['Lumière',x=>x.c.sub.lumiere,'max',(v,x)=>esc([x.l.expo,x.l.traversant?'traversant':null].filter(Boolean).join(', ')||(v==null?'?':Math.round(v*100)+'/100'))],['Extérieur',x=>x.l.outdoor||0,'max',(v,x)=>x.l.outdoorType?esc(x.l.outdoorType)+(nz(x.l.outdoor)?' '+num(x.l.outdoor)+' m²':''):'Aucun'],['Parking',x=>x.l.parking?1:0,'max',(v,x)=>x.l.parking?'Oui':x.l.parking===false?'Non':'?'],
-  ['Charges/mois',x=>x.l.charges,'min',eur],['Distance',x=>x.c.km,'min',v=>num(v)+' km'],['Frais de notaire',x=>x.c.notary,null,eur],['Travaux estimés',x=>x.c.renov,'min',eur],['Coût total',x=>x.c.total,'min',eur],['Mensualité',x=>x.c.monthly,'min',eur],
+  ['Charges/mois',x=>x.l.charges,'min',eur],['Distance',x=>x.c.km,'min',v=>num(v)+' km'],['Transport',x=>x.c.sub.transport,'max',(v,x)=>nz(x.l.trajet)?x.l.trajet+' min'+(x.l.direct?' direct':''):(v==null?'?':Math.round(v*100)+'/100')],['Sécurité',x=>x.c.sub.securite,'max',v=>v==null?'?':Math.round(v*100)+'/100'],['Frais de notaire',x=>x.c.notary,null,eur],['Travaux estimés',x=>x.c.renov,'min',eur],['Coût total',x=>x.c.total,'min',eur],['Mensualité',x=>x.c.monthly,'min',eur],
   ['Alertes',x=>x.c.flags.filter(f=>f.lvl!=='info').length,'min',(v,x)=>x.c.flags.filter(f=>f.lvl!=='info').map(f=>`<span class="fl ${f.lvl}">${esc(f.txt)}</span>`).join(' ')||'Aucune'],['Ma note',x=>x.l.rating,'max',v=>v?'★'.repeat(v):'–'],['Statut',x=>x.l.status,null,v=>ST[v]||'']];
  box.innerHTML=`<div class="card scroll"><table class="cmp"><thead><tr><th></th>${items.map(x=>`<th><button class="ttl" data-open="${esc(x.l.id)}" style="font-size:18px">${esc(x.l.title||'Annonce')}</button><br><button class="ghost small" data-rm="${esc(x.l.id)}" style="min-height:36px;margin-top:6px">Retirer</button></th>`).join('')}</tr></thead><tbody>${rows.map(([lab,get,dir,fmt])=>{const vals=items.map(get);const nums=vals.filter(v=>typeof v==='number'&&!isNaN(v));const best=dir&&nums.length>1?(dir==='max'?Math.max(...nums):Math.min(...nums)):null;
   return`<tr><th>${lab}</th>${items.map((x,i)=>{const v=vals[i];const isB=best!=null&&v===best&&nums.filter(n=>n===best).length<nums.length;return`<td class="${isB?'best':''}">${v==null&&!['Étage','DPE / GES','Lumière','Extérieur','Parking','Pièces / chambres','Alertes'].includes(lab)?'–':fmt(v,x)}</td>`}).join('')}</tr>`}).join('')}</tbody></table></div><p class="mut small">En vert : la meilleure valeur de chaque ligne.</p>`}
@@ -1070,7 +1098,7 @@ function fillSettings(){
  const F=[['fin.apport','Apport personnel (€)'],['fin.taux','Taux du crédit (%)'],['fin.duree','Durée (ans)'],['fin.assur','Assurance emprunteur (% par an)'],['not.ancien','Frais de notaire ancien (%)'],['not.neuf','Frais de notaire neuf (%)'],['renov.F','Travaux si DPE F (€/m²)'],['renov.G','Travaux si DPE G (€/m²)']];
  $('#finBox').innerHTML=F.map(([p,lab])=>{const[a,b]=p.split('.');return`<label class="fld"><span>${lab}</span><input inputmode="decimal" data-s="${p}" value="${esc(S[a][b])}"></label>`}).join('');
  $('#avgBox').innerHTML=Array.from({length:20},(_,i)=>`<label class="fld"><span>${arrL(i+1)}</span><input inputmode="numeric" data-avg="${i+1}" value="${esc(S.avg[i+1])}"></label>`).join('');
- $('#wRes').textContent=S.work?`Lieu actuel : ${S.work.label||''} (${S.work.lat.toFixed(4)}, ${S.work.lng.toFixed(4)})`:'Aucun lieu défini.';fillFilters()}
+ $('#wRes').textContent=S.work?`Lieu actuel : ${S.work.label||''} (${S.work.lat.toFixed(4)}, ${S.work.lng.toFixed(4)})`:'Aucun lieu défini.';fillFilters();renderCom()}
 function wPct(){const ks=Object.keys(W0).filter(k=>k!=='distance'||S.work);const sum=ks.reduce((a,k)=>a+(+S.w[k]||0),0)||1;Object.keys(W0).forEach(k=>{const el=$('#wv-'+k);if(el)el.textContent=(k==='distance'&&!S.work)?'inactif':Math.round((+S.w[k]||0)/sum*100)+' %'})}
 let sT;const sUp=()=>{clearTimeout(sT);sT=setTimeout(()=>{saveS();renderAll()},350)};
 $('#wBox').addEventListener('input',e=>{const k=e.target.dataset.w;if(!k)return;S.w[k]=+e.target.value;wPct();sUp()});
@@ -1085,8 +1113,15 @@ $('#bLoc').onclick=async()=>{const a=$('#wAddr').value.trim();const res=$('#wRes
  if(!w){const ar=(m=a.match(/\b75(?:0(\d{2})|116)\b/))?(m[1]?+m[1]:16):(m=a.match(/paris\s*(\d{1,2})|\b(\d{1,2})\s*(?:e|er|ème|eme)\b/i))?+(m[1]||m[2]):null;if(ar>=1&&ar<=20)w={lat:CENT[ar][0],lng:CENT[ar][1],label:lab+' (centre du '+arrL(ar)+')'}}
  if(w){S.work=w;saveS();fillSettings();renderAll()}else res.textContent='Adresse non reconnue : indiquez le code postal (750xx), « 48.87, 2.34 », ou cliquez sur la carte.'};
 
+const COMF=[['name','Commune','text'],['cp','Code postal','text'],['prix','Prix moyen €/m² (ancien)','num'],['prixSrc','Source prix (année)','text'],['gare','Gare la plus proche','text'],['ligne','Ligne','text'],['arrivee','Gare d’arrivée à Paris','text'],['minutes','Trajet direct (min)','num'],['secu','Sécurité','secu'],['secuSrc','Source sécurité (année)','text']];
+function renderCom(){const cs=S.communes||[];
+ $('#comT').innerHTML=`<thead><tr>${COMF.map(f=>`<th>${f[1]}</th>`).join('')}<th></th></tr></thead><tbody>${cs.length?cs.map(r=>`<tr data-cid="${esc(r.id)}">${COMF.map(([k,,t])=>`<td>${t==='secu'?`<select data-cf="${k}"><option value="">?</option>${['bonne','moyenne','faible'].map(o=>`<option${r[k]===o?' selected':''}>${o}</option>`).join('')}</select>`:`<input data-cf="${k}"${t==='num'?' inputmode="decimal"':''} value="${esc(r[k]??'')}" style="min-width:${['name','prixSrc','secuSrc','arrivee','gare'].includes(k)?'10em':'6em'}">`}</td>`).join('')}<td><button class="ghost" data-cdel>Supprimer</button></td></tr>`).join(''):`<tr><td colspan="${COMF.length+1}" class="mut">Aucune commune suivie.</td></tr>`}</tbody>`}
+$('#comT').addEventListener('input',e=>{const t=e.target,k=t.dataset.cf;if(!k)return;const r=(S.communes||[]).find(x=>x.id===t.closest('tr').dataset.cid);if(!r)return;r[k]=(k==='prix'||k==='minutes')?N(t.value):t.value.trim();sUp()});
+$('#comT').addEventListener('click',e=>{if(!e.target.closest('[data-cdel]'))return;const id=e.target.closest('tr').dataset.cid;const i=S.communes.findIndex(x=>x.id===id);if(i<0)return;const old=S.communes[i];S.communes.splice(i,1);saveS();renderCom();renderAll();toast('Commune supprimée',()=>{S.communes.splice(i,0,old);saveS();renderCom();renderAll()})});
+$('#comAdd').onclick=()=>{S.communes=S.communes||[];S.communes.push({id:'c'+Date.now().toString(36),name:'',cp:'',prix:null,prixSrc:'',gare:'',ligne:'',arrivee:'',minutes:null,secu:'',secuSrc:''});saveS();renderCom()};
+
 /* ---------- export / import ---------- */
-const CSVK=['id','added','status','title','url','price','surface','carrez','included','rooms','bedrooms','floor','floorsTotal','lift','arr','quartier','dpe','ges','year','charges','outdoor','outdoorType','parking','expo','traversant','isNew','agency','renov','rating','notes','lat','lng','desc'];
+const CSVK=['id','added','status','title','url','price','surface','carrez','included','rooms','bedrooms','floor','floorsTotal','lift','arr','quartier','dpe','ges','year','charges','outdoor','outdoorType','parking','expo','traversant','isNew','agency','renov','rating','notes','lat','lng','commune','cp','gare','marche','trajet','direct','source','found','avis','desc'];
 const cq=v=>{const s=v==null?'':String(v);return/[;"\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
 function toCSV(){const head=[...CSVK,'score','surface_reelle','prix_m2_reel','cout_total','mensualite','alertes'];
  return'﻿'+head.join(';')+'\n'+L.map(l=>{const c=calc(l);return[...CSVK.map(k=>BOOLK.has(k)?(l[k]==null?'':l[k]?'oui':'non'):NUMK.has(k)&&nz(l[k])?String(l[k]).replace('.',','):l[k]),c.score,c.real&&Math.round(c.real*10)/10,c.ppm2&&Math.round(c.ppm2),c.total&&Math.round(c.total),c.monthly&&Math.round(c.monthly),c.flags.map(f=>f.txt).join(' | ')].map(cq).join(';')}).join('\n')}
@@ -1450,7 +1485,8 @@ function coachData(){const out=[];
  out.push(`Loan settings in app: apport ${Math.round(+S.fin.apport||0)} EUR, rate ${S.fin.taux}%, ${S.fin.duree} years, insurance ${S.fin.assur}%/yr`);
  if(+B.price){const p=bPlan(+B.price);out.push(`Budget simulator: price ${Math.round(B.price)} EUR (${B.neuf?'new':'older'}), total cost ${Math.round(p.total)} EUR, loan ${Math.round(p.loan)} EUR, monthly ${Math.round(p.month)} EUR${p.endet!=null?`, debt ratio ${NF.format(p.endet*100)}%`:''}`)}
  const own=L.filter(l=>!l.sample).map(l=>({l,c:calc(l)})).sort((a,b)=>b.c.score-a.c.score);
- out.push(own.length?`Saved listings: ${own.length}. Top ${Math.min(5,own.length)}:\n`+own.slice(0,5).map(({l,c})=>`  - ${arrL(l.arr)} arr., ${Math.round(l.price||0)} EUR, ${c.real?NF.format(c.real)+' m2':'surface ?'}, ${c.ppm2?Math.round(c.ppm2)+' EUR/m2':''}${c.ratio?` (${Math.round((c.ratio-1)*100)}% vs area average)`:''}, DPE ${l.dpe||'?'}, score ${c.score}/100${c.flags.filter(f=>f.lvl==='grave').length?', red flags: '+c.flags.filter(f=>f.lvl==='grave').map(f=>f.txt).join(', '):''}`).join('\n'):'Saved listings: none yet');
+ out.push(own.length?`Saved listings: ${own.length}. Top ${Math.min(5,own.length)}:\n`+own.slice(0,5).map(({l,c})=>`  - ${l.arr!=null?arrL(l.arr)+' arr.':(l.commune||'?')}, ${nz(l.trajet)?l.trajet+' min to Paris'+(l.direct?' direct':'')+', ':''}${Math.round(l.price||0)} EUR, ${c.real?NF.format(c.real)+' m2':'surface ?'}, ${c.ppm2?Math.round(c.ppm2)+' EUR/m2':''}${c.ratio?` (${Math.round((c.ratio-1)*100)}% vs area average)`:''}, DPE ${l.dpe||'?'}, score ${c.score}/100${c.flags.filter(f=>f.lvl==='grave').length?', red flags: '+c.flags.filter(f=>f.lvl==='grave').map(f=>f.txt).join(', '):''}`).join('\n'):'Saved listings: none yet');
+ if((S.communes||[]).length)out.push('Followed communes: '+S.communes.map(r=>`${r.name} (${r.prix||'?'} EUR/m2, ${r.minutes||'?'} min direct via ${r.ligne||'?'}, security ${r.secu||'?'})`).join('; '));
  const fx=fxSorted().at(-1);if(fx)out.push(`Last EUR/VND rate noted: 1 EUR = ${Math.round(fx.rate)} VND (${fx.date})`);
  return out.join('\n')}
 function cxSys(){return`ROLE
