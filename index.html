@@ -160,7 +160,7 @@ ul.plain{margin:6px 0;padding-left:20px}
  <div class="wrap">
   <div class="plq"><span class="n">75</span><div><h1>Le vrai prix au m²</h1><p>Vos annonces nettoyées, les pièges signalés, les vraies opportunités en tête.</p></div></div>
   <nav>
-   <a href="#liste">Classement</a><a href="#carte">Carte</a><a href="#comparer">Comparer<b id="cmpN">0</b></a><a href="#epargne">Épargne &amp; apport</a><a href="#reglages">Réglages</a>
+   <a href="#liste">Classement</a><a href="#carte">Carte</a><a href="#comparer">Comparer<b id="cmpN">0</b></a><a href="#epargne">Épargne &amp; apport</a><a href="#placer">Où placer</a><a href="#reglages">Réglages</a>
    <span id="sync">Enregistré sur cet appareil</span>
   </nav>
  </div>
@@ -288,6 +288,154 @@ ul.plain{margin:6px 0;padding-left:20px}
   <p class="mut small">Vos annonces sont enregistrées dans ce navigateur et, si vous êtes connecté, sur votre compte pour les retrouver sur votre téléphone.</p>
   <div class="row"><button id="bJson">Exporter JSON</button><button id="bCsv">Exporter CSV</button><label class="tog" style="border:1px solid var(--line);border-radius:8px;padding:0 14px;cursor:pointer"><input type="file" id="fImp" accept=".json,.csv,application/json,text/csv" style="display:none">Importer JSON ou CSV</label><button id="bWipe">Tout effacer</button></div>
   <div id="expBox"></div>
+ </div>
+</section>
+<section id="v-placer" hidden class="stack-sp">
+ <h2 class="headline">Placer l’apport en attendant l’achat</h2>
+ <p class="mut small" style="margin-top:-6px">Analyse des placements pour l’apport. Le suivi de l’épargne et de l’objectif est dans l’onglet <a href="#epargne">Épargne &amp; apport</a>.</p>
+ <div class="card">
+  <h3>Mon profil et les hypothèses</h3>
+  <p class="small">30 000 € à placer, horizon de 5 ans ou plus, objectif : acheter un appartement, perte temporaire acceptée : 0 %, aucun compte ouvert, débutant(e).</p>
+  <ul class="small">
+   <li>Une perte acceptée de 0 % exclut tout placement en Bourse (ETF, actions) : seuls les placements à capital garanti sont retenus.</li>
+   <li>Je suppose que vous n’avez encore aucun Livret A ni LDDS (plafonds entiers disponibles).</li>
+   <li>L’éligibilité au LEP dépend de votre revenu fiscal de référence : non vérifiée, à contrôler.</li>
+   <li>La date d’achat peut arriver plus tôt que prévu : l’argent doit pouvoir être retiré rapidement.</li>
+  </ul>
+  <p class="mut small">Données relevées le 26 novembre 2026. Ceci n’est pas un conseil en investissement : vérifiez chaque chiffre à la source avant d’ouvrir un compte.</p>
+ </div>
+
+ <h3 class="headline" style="font-size:28px">1. Les données</h3>
+ <div class="card scroll">
+  <table id="plData">
+   <thead><tr><th>Placement</th><th class="n">Taux brut</th><th class="n">Net d’impôt</th><th>Plafond</th><th>Disponibilité</th><th>Capital garanti</th><th>Source (date)</th></tr></thead>
+   <tbody>
+    <tr><td><b>Livret A</b></td><td class="n">1,70 %</td><td class="n">1,70 %</td><td>22 950 €</td><td>Immédiate</td><td>Oui</td><td><a href="https://www.info.gouv.fr/index.php/actualite/augmentation-du-taux-du-livret-a-a-compter-du-1er-aout-2026" target="_blank" rel="noopener">info.gouv.fr (31/07/2026)</a>, plafond : <a href="https://rendementbourse.com/articles/livrets-comptes-a-terme" target="_blank" rel="noopener">rendementbourse (14/11/2026)</a></td></tr>
+    <tr><td><b>LDDS</b></td><td class="n">1,70 %</td><td class="n">1,70 %</td><td>12 000 €</td><td>Immédiate</td><td>Oui</td><td><a href="https://www.info.gouv.fr/index.php/actualite/augmentation-du-taux-du-livret-a-a-compter-du-1er-aout-2026" target="_blank" rel="noopener">info.gouv.fr (31/07/2026)</a>, plafond : <a href="https://rendementbourse.com/articles/livrets-comptes-a-terme" target="_blank" rel="noopener">rendementbourse (14/11/2026)</a></td></tr>
+    <tr><td><b>LEP</b> <span class="mut small">(sous conditions de revenus)</span></td><td class="n">2,50 %</td><td class="n">2,50 %</td><td>10 000 €</td><td>Immédiate</td><td>Oui</td><td><a href="https://www.info.gouv.fr/index.php/actualite/augmentation-du-taux-du-livret-a-a-compter-du-1er-aout-2026" target="_blank" rel="noopener">info.gouv.fr (31/07/2026)</a></td></tr>
+    <tr><td><b>Fonds euros</b> (assurance vie)</td><td class="n">2,63 % moyen en 2025<br><span class="mut small">2,90 % prévu en 2026</span></td><td class="n">≈ 2,40 %<br><span class="mut small">si 2,90 %, après prélèvements sociaux</span></td><td>Aucun</td><td>Quelques jours</td><td>Oui (selon contrat)</td><td><a href="https://www.toutsurmesfinances.com/actualites/?p=1195" target="_blank" rel="noopener">ACPR via toutsurmesfinances (30/06/2026)</a>, <a href="https://placement.meilleurtaux.com/assurance-vie/actualites/2026-octobre/fonds-en-euros-2026-pourquoi-les-rendements-remontent-encore.html" target="_blank" rel="noopener">meilleurtaux (10/2026)</a>, <a href="https://www.moneyvox.fr/assurance-vie/actualites/110223/ce-qui-va-changer-pour-les-taux-2026" target="_blank" rel="noopener">moneyvox (2026)</a></td></tr>
+    <tr><td><b>Compte à terme</b></td><td class="n">1,84 % à 2,83 %<br><span class="mut small">jusqu’à 3,15 % sur 5 ans</span></td><td class="n">≈ 1,26 % à 2,16 %<br><span class="mut small">après flat tax 31,4 %</span></td><td>Selon offre</td><td>Bloqué (pénalité si sortie)</td><td>Oui</td><td><a href="https://www.meilleurescpi.com/conseils/quest-ce-quun-compte-a-terme-informations-2024/" target="_blank" rel="noopener">meilleurescpi (24/06/2026)</a>, <a href="https://www.detective-banque.fr/?p=78634" target="_blank" rel="noopener">detective-banque (date non trouvée)</a>, flat tax : <a href="https://placement.meilleurtaux.com/livret-epargne/actualites/2026-novembre/epargne-sans-risque-les-taux-a-suivre-en-novembre.html" target="_blank" rel="noopener">meilleurtaux (11/2026)</a></td></tr>
+    <tr><td><b>PEL</b> (ouvert en 2026)</td><td class="n">2,00 %</td><td class="n">1,40 %</td><td>Non trouvé</td><td>Bloqué 4 ans minimum</td><td>Oui</td><td><a href="https://www.service-public.gouv.fr/particuliers/actualites/A16217?lang=fr" target="_blank" rel="noopener">service-public.fr (23/12/2025)</a>, <a href="https://selectra.info/finance/actualites/marche/pel-taux-nouveaux-plans-anciens-pel-conserver" target="_blank" rel="noopener">selectra (2026)</a></td></tr>
+    <tr><td><b>Super-livret</b> bancaire</td><td class="n">1,77 % en moyenne</td><td class="n">≈ 1,21 %</td><td>Selon banque</td><td>Immédiate</td><td>Oui</td><td><a href="https://www.moneyvox.fr/placement/actualites/111060/assurance-vie-au-top-livret-a-et-lep-au-rebond-les-taux-de-votre-epargne-sans-risque-en-novembre-2026" target="_blank" rel="noopener">moneyvox (11/2026)</a></td></tr>
+   </tbody>
+  </table>
+ </div>
+ <div class="card scroll">
+  <h3>Pour comparaison : un ETF actions (non retenu)</h3>
+  <table>
+   <thead><tr><th>Donnée</th><th>Amundi PEA Monde (MSCI World), FR001400U5Q4</th><th>Source (date)</th></tr></thead>
+   <tbody>
+    <tr><td>Indice</td><td>MSCI World (environ 1 700 entreprises de pays développés), réplication synthétique</td><td><a href="https://www.amundietf.fr/pdfDocuments/download/9aa891c7-edc3-4426-ab7b-eebc94e3f936/MonthlyFactsheet_4586958_CL205335_FRA_FRA_ETF_INSTITUTIONNEL_20260731.pdf" target="_blank" rel="noopener">Amundi (31/07/2026)</a></td></tr>
+    <tr><td>Frais (TER)</td><td>0,20 % par an</td><td>Amundi (31/07/2026)</td></tr>
+    <tr><td>Encours</td><td>1 266,52 M€</td><td>Amundi (31/07/2026)</td></tr>
+    <tr><td>Performance 1 an</td><td>+21,24 %</td><td><a href="https://extraetf.com/fr/etf-profile/FR001400U5Q4" target="_blank" rel="noopener">extraetf (date non affichée)</a></td></tr>
+    <tr><td>Performance 3 et 5 ans</td><td>Non trouvé (fonds lancé le 04/03/2025)</td><td><a href="https://www.test.de/Fonds-im-Test-Fuenf-Punkte-fuer-die-Besten-4331006-detail/investmentfonds2015projekt!FR001400U5Q4/" target="_blank" rel="noopener">test.de</a></td></tr>
+    <tr><td>Plus forte baisse historique de l’indice</td><td>−54,03 % (en dollars, crise de 2008)</td><td><a href="https://www.alphacubator.com/analysis/WORLD.X" target="_blank" rel="noopener">alphacubator (08/2026)</a></td></tr>
+    <tr><td>Principales lignes, pays, secteurs</td><td>Non trouvé</td><td>À lire sur la fiche Amundi</td></tr>
+    <tr><td>Éligible PEA</td><td>Oui</td><td>Amundi</td></tr>
+   </tbody>
+  </table>
+  <p class="small"><b>Actions individuelles : non analysées.</b> Une seule entreprise peut perdre 50 % ou plus en quelques mois, ce qui est incompatible avec une perte acceptée de 0 %.</p>
+ </div>
+
+ <h3 class="headline" style="font-size:28px">2. L’analyse</h3>
+ <div class="two">
+  <div class="card">
+   <h3>Faits</h3>
+   <ul class="small">
+    <li>Livret A et LDDS : même taux (1,70 % net) et ensemble 34 950 € de plafond, donc vos 30 000 € y tiennent en entier.</li>
+    <li>L’inflation 2026 est estimée à 2,1 % (<a href="https://placement.meilleurtaux.com/livret-epargne/actualites/2026-novembre/epargne-sans-risque-les-taux-a-suivre-en-novembre.html" target="_blank" rel="noopener">meilleurtaux, 11/2026</a>) : à 1,70 %, le pouvoir d’achat baisse légèrement.</li>
+    <li>Le taux du Livret A sera révisé le 1er février 2027, avec des projections au-dessus de 2 % (<a href="https://www.selexium.com/?p=224313" target="_blank" rel="noopener">selexium, 11/2026</a>).</li>
+    <li>Le taux du fonds euros n’est connu qu’en fin d’année, il n’est pas garanti à l’avance.</li>
+    <li>Le PEL rapporte 1,40 % net, moins que le Livret A, et bloque l’argent 4 ans.</li>
+   </ul>
+  </div>
+  <div class="card">
+   <h3>Interprétation</h3>
+   <ul class="small">
+    <li>Pour un apport immobilier, la sécurité et la disponibilité comptent plus que 0,5 point de rendement.</li>
+    <li>Le fonds euros est le seul placement garanti qui rapporte nettement plus que le Livret A, au prix de quelques jours de délai et d’un taux incertain.</li>
+    <li>Les comptes à terme et le PEL bloquent l’argent : risqué si vous trouvez l’appartement plus tôt que prévu.</li>
+    <li>Un ETF peut gagner beaucoup plus, mais il peut aussi être en forte baisse le jour où vous signez chez le notaire.</li>
+   </ul>
+  </div>
+ </div>
+ <div class="card scroll">
+  <h3>Classement et 3 risques principaux</h3>
+  <table>
+   <thead><tr><th>#</th><th>Placement</th><th>Risques</th></tr></thead>
+   <tbody>
+    <tr><td>1</td><td><b>Livret A + LDDS</b></td><td>Taux sous l’inflation · taux révisable tous les 6 mois · plafonds limités</td></tr>
+    <tr><td>2</td><td><b>LEP</b> (si éligible)</td><td>Éligibilité revérifiée chaque année · plafond 10 000 € · taux révisable</td></tr>
+    <tr><td>3</td><td><b>Fonds euros</b></td><td>Taux inconnu à l’avance · frais du contrat · certains contrats imposent une part en unités de compte (risquées)</td></tr>
+    <tr><td>4</td><td><b>Compte à terme</b></td><td>Argent bloqué · pénalité en cas de sortie anticipée · imposé à 31,4 %</td></tr>
+    <tr><td>5</td><td><b>Super-livret</b></td><td>Taux promotionnel temporaire · imposé à 31,4 % · conditions d’offre</td></tr>
+    <tr><td>6</td><td><b>PEL</b></td><td>Bloqué 4 ans · 1,40 % net seulement · imposé</td></tr>
+    <tr><td>✕</td><td><b>ETF MSCI World</b></td><td>Perte possible de 50 % ou plus · peut être en baisse au moment de l’achat · exposition au dollar</td></tr>
+   </tbody>
+  </table>
+  <p class="small"><b>Doublons :</b> Livret A et LDDS sont identiques (même taux, même risque), c’est normal : le LDDS sert juste à dépasser le plafond du Livret A. Rien d’autre ne se chevauche, puisque vous ne détenez encore rien.</p>
+ </div>
+
+ <h3 class="headline" style="font-size:28px">3. La décision</h3>
+ <div class="card scroll">
+  <table>
+   <thead><tr><th>Placement</th><th>Verdict</th><th>Pourquoi</th></tr></thead>
+   <tbody>
+    <tr><td>Livret A + LDDS</td><td><span class="fl info">Oui, base</span></td><td>Garanti, disponible tout de suite, net d’impôt</td></tr>
+    <tr><td>LEP</td><td><span class="fl info">Oui si éligible</span></td><td>Meilleur taux garanti et disponible (2,50 % net)</td></tr>
+    <tr><td>Fonds euros</td><td><span class="fl alerte">Option</span></td><td>Plus de rendement si l’achat est à 3 ans ou plus</td></tr>
+    <tr><td>Compte à terme</td><td><span class="fl alerte">Plutôt non</span></td><td>Gain faible après impôt, argent bloqué</td></tr>
+    <tr><td>Super-livret</td><td><span class="fl alerte">Plutôt non</span></td><td>Moins bien que le Livret A une fois imposé, sauf promo courte</td></tr>
+    <tr><td>PEL</td><td><span class="fl grave">Non</span></td><td>Rapporte moins que le Livret A et bloque l’argent</td></tr>
+    <tr><td>ETF / actions</td><td><span class="fl grave">Non</span></td><td>Incompatible avec une perte acceptée de 0 %</td></tr>
+   </tbody>
+  </table>
+ </div>
+
+ <div class="card">
+  <h3>Simulateur de répartition</h3>
+  <p class="mut small">Choisissez un scénario puis ajustez les montants. Les taux sont ceux d’aujourd’hui : ils changeront, le résultat est une estimation.</p>
+  <div class="row" style="margin:10px 0">
+   <button class="pri" data-psc="a">A. Simple</button><button data-psc="b">B. Avec LEP</button><button data-psc="c">C. Avec fonds euros</button>
+  </div>
+  <div class="fgrid">
+   <label class="fld"><span>Durée (années)</span><input id="plY" inputmode="decimal" value="5"></label>
+   <label class="fld"><span>Versement mensuel en plus (€)</span><input id="plM" inputmode="decimal" value="0"></label>
+   <label class="fld"><span>Inflation supposée (%)</span><input id="plI" inputmode="decimal" value="2,1"></label>
+  </div>
+  <div class="scroll"><table id="plAlloc"></table></div>
+  <div class="kpis" id="plK" style="margin-top:12px"></div>
+  <p class="small" id="plW"></p>
+ </div>
+
+ <div class="two">
+  <div class="card">
+   <h3>Ma répartition conseillée</h3>
+   <ul class="small">
+    <li><b>Par défaut (A) :</b> 22 950 € sur un Livret A + 7 050 € sur un LDDS. Tout est disponible en 24 h le jour où vous signez.</li>
+    <li><b>Si vous êtes éligible au LEP (B) :</b> 10 000 € sur le LEP + 20 000 € sur le Livret A.</li>
+    <li><b>Si l’achat est à 3 ans ou plus (C) :</b> 12 000 € sur le Livret A (réserve immédiate) + 18 000 € sur le fonds euros d’un contrat en ligne sans frais d’entrée.</li>
+   </ul>
+   <h3 style="margin-top:12px">Tout d’un coup ou chaque mois ?</h3>
+   <p class="small">Avec des placements garantis, il n’y a aucun risque de « mauvais moment » : placez les 30 000 € dès maintenant. Ensuite, programmez un virement mensuel automatique de votre épargne : d’abord sur le Livret A et le LDDS jusqu’aux plafonds, puis sur le LEP ou le fonds euros.</p>
+  </div>
+  <div class="card">
+   <h3>Ce qui me ferait changer d’avis</h3>
+   <ul class="small">
+    <li>Si l’achat recule à 8 ans ou plus et que vous acceptez une baisse temporaire de 20 à 30 % : une petite part d’ETF MSCI World dans un PEA aurait du sens.</li>
+    <li>Si vous trouvez l’appartement dans les 12 mois : tout sur Livret A et LDDS, pas de fonds euros.</li>
+    <li>Si le taux du Livret A monte nettement en février 2027 : l’intérêt du fonds euros diminue.</li>
+    <li>Si un fonds euros sérieux propose un bonus garanti sur les nouveaux versements, sans obligation d’unités de compte.</li>
+    <li>Si votre banque de prêt demande de placer l’apport chez elle pour obtenir un meilleur taux de crédit.</li>
+   </ul>
+  </div>
+ </div>
+
+ <div class="card">
+  <h3>À vérifier avant d’ouvrir quoi que ce soit</h3>
+  <div id="plChk"></div>
+  <p class="mut small" style="margin-top:8px">Cases enregistrées dans ce navigateur.</p>
  </div>
 </section>
 </main>
@@ -986,7 +1134,7 @@ ve.addEventListener('click',e=>{const t=e.target.closest('button');if(!t)return;
 $('#fImpE').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const d=JSON.parse(await f.text());const src=d&&d.epargne?d.epargne:d;if(!src||!Array.isArray(src.acc))throw 0;const old=E;E=mergeE(src);saveE();renderEp();toast('Épargne importée',()=>{E=old;saveE();renderEp()})}catch(x){toast('Fichier illisible')}};
 
 /* ---------- navigation ---------- */
-const VIEWS=['liste','carte','comparer','epargne','reglages'];
+const VIEWS=['liste','carte','comparer','epargne','placer','reglages'];
 function route(){const v=VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):'liste';VIEWS.forEach(x=>{$('#v-'+x).hidden=x!==v});$$('nav a').forEach(a=>{if(a.getAttribute('href')==='#'+v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
  if(v==='carte'){renderArrT();requestAnimationFrame(drawMap)}if(v==='comparer')renderCmp();if(v==='epargne')renderEp();if(v==='liste')renderList()}
 function renderAll(){cityCache.size>300&&cityCache.clear();renderList();const v=location.hash.slice(1);if(v==='carte'){renderArrT();drawMap()}if(v==='comparer')renderCmp();if(curId&&!$('#ov').hidden)liveD();wPct()}
@@ -994,6 +1142,29 @@ window.addEventListener('hashchange',route);
 fillSettings();route();
 initCloud();initCaps();
 }
+</script>
+<script>
+(()=>{
+const R={la:['Livret A',1.7,22950],ld:['LDDS',1.7,12000],lep:['LEP',2.5,10000],fe:['Fonds euros (net)',2.4,0]};
+const SC={a:{la:22950,ld:7050,lep:0,fe:0},b:{la:20000,ld:0,lep:10000,fe:0},c:{la:12000,ld:0,lep:0,fe:18000}};
+let A={...SC.a};
+const q=s=>document.querySelector(s),num=v=>parseFloat(String(v).replace(/\s/g,'').replace(',','.'))||0;
+const eur=n=>Math.round(n).toLocaleString('fr-FR')+' €';
+function table(){q('#plAlloc').innerHTML='<thead><tr><th>Placement</th><th class="n">Montant (€)</th><th class="n">Taux net (%)</th></tr></thead><tbody>'+Object.keys(R).map(k=>`<tr><td>${R[k][0]}</td><td class="n"><input data-pa="${k}" inputmode="decimal" value="${A[k]}" style="width:8em;text-align:right"></td><td class="n"><input data-pr="${k}" inputmode="decimal" value="${String(R[k][1]).replace('.',',')}" style="width:5em;text-align:right"></td></tr>`).join('')+'</tbody>';}
+function calc(){const y=num(q('#plY').value),m=num(q('#plM').value),inf=num(q('#plI').value)/100;let tot=0,start=0,w=[];
+ Object.keys(R).forEach(k=>{const a=num(A[k]);start+=a;tot+=a*Math.pow(1+R[k][1]/100,y);if(R[k][2]&&a>R[k][2])w.push(`${R[k][0]} : plafond de ${eur(R[k][2])} dépassé.`)});
+ const r0=start?(Math.pow(tot/start,1/Math.max(y,1e-9))-1):0;let mv=0;for(let i=0;i<Math.round(y*12);i++)mv=(mv+m)*Math.pow(1+r0,1/12);
+ const fin=tot+mv,paid=start+m*Math.round(y*12),real=fin/Math.pow(1+inf,y);
+ q('#plK').innerHTML=[[eur(fin),'Valeur estimée dans '+String(y).replace('.',',')+' ans'],[eur(fin-paid),'Intérêts nets'],[(r0*100).toFixed(2).replace('.',',')+' %','Rendement net moyen'],[eur(real),'En euros d’aujourd’hui']].map(([b,s])=>`<div class="kpi"><b>${b}</b><span>${s}</span></div>`).join('');
+ q('#plW').innerHTML=(w.length?'<span class="bad">'+w.join(' ')+'</span> ':'')+'Total placé : '+eur(start)+'.';}
+document.addEventListener('input',e=>{const t=e.target;if(t.dataset.pa){A[t.dataset.pa]=num(t.value);calc()}else if(t.dataset.pr){R[t.dataset.pr][1]=num(t.value);calc()}else if(['plY','plM','plI'].includes(t.id))calc()});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-psc]');if(!b)return;A={...SC[b.dataset.psc]};document.querySelectorAll('[data-psc]').forEach(x=>x.classList.toggle('pri',x===b));table();calc()});
+const CK=['Mon revenu fiscal de référence est sous le plafond du LEP (simulateur sur service-public.fr)','Les taux du Livret A, LDDS et LEP sur service-public.fr ou economie.gouv.fr','Je n’ai pas déjà un Livret A ou un LDDS ouvert ailleurs (un seul de chaque par personne)','Fonds euros : frais d’entrée et de versement à 0 %','Fonds euros : frais de gestion annuels et garantie du capital brute ou nette de frais','Fonds euros : pas d’obligation de placer une part en unités de compte','Fonds euros : rendements servis les années précédentes, sur le site de l’assureur','Délai de retrait annoncé (rachat) du contrat d’assurance vie','Banque ou assureur autorisé : registre REGAFI ou liste de l’AMF','Compte à terme ou super-livret : taux après la fin de la promotion et pénalités de sortie'];
+let st={};try{st=JSON.parse(localStorage.getItem('placer-chk')||'{}')}catch(e){}
+q('#plChk').innerHTML=CK.map((t,i)=>`<label class="tog"><input type="checkbox" data-pck="${i}" ${st[i]?'checked':''}> ${t}</label>`).join('');
+q('#plChk').addEventListener('change',e=>{const i=e.target.dataset.pck;if(i==null)return;st[i]=e.target.checked;try{localStorage.setItem('placer-chk',JSON.stringify(st))}catch(err){}});
+table();calc();
+})();
 </script>
 </body>
 </html>
